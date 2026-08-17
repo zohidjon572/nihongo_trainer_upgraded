@@ -22,7 +22,7 @@
     margin: 20px 0;
   }
 
-  /* Chap tarafdagi Yaponiyaga mos keluvchi Sof CSS/SVG Art (Internet shart emas) */
+  /* Chap tarafdagi Yaponiyaga mos keluvchi Sof CSS/SVG Art */
   .auth-image-side {
     flex: 1.2;
     background: linear-gradient(180deg, #e0f2f1 0%, #b2dfdb 100%);
@@ -53,9 +53,9 @@
   .auth-card {
     background: #ffffff;
     padding: 40px 35px;
-    border-radius: 8px;
+    border-radius: 12px;
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 2;
@@ -81,7 +81,7 @@
 
   .auth-card p.subtitle {
     font-size: 0.85rem;
-    color: #444444;
+    color: #555555;
     margin-bottom: 25px;
   }
 
@@ -100,13 +100,14 @@
     letter-spacing: 0.5px;
   }
 
+  /* Django generatsiya qiladigan inputlarga moslashish uchun umumiy selector */
   .field-group input {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #dbe3e6;
     background-color: #eef4f8;
-    border-radius: 4px;
-    font-size: 0.95rem;
+    border-radius: 6px;
+    font-size: 1rem; /* Mobil qurilmalarda avtomatik zoom bo'lmasligi uchun 16px (1rem) qilindi */
     outline: none;
     box-sizing: border-box;
     transition: all 0.2s ease;
@@ -115,7 +116,7 @@
   .field-group input:focus {
     border-color: var(--jp-teal-dark);
     background-color: #ffffff;
-    box-shadow: 0 0 0 2px rgba(31, 80, 80, 0.15);
+    box-shadow: 0 0 0 3px rgba(31, 80, 80, 0.15);
   }
 
   /* Xatoliklar */
@@ -144,7 +145,7 @@
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 1px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s ease;
     margin-top: 10px;
@@ -172,13 +173,23 @@
     text-decoration: underline;
   }
 
-  @media (max-width: 768px) {
+  /* Responsive dizayn (Planshet va Telefonlar uchun) */
+  @media (max-width: 900px) {
     .auth-hero-section {
       flex-direction: column;
+      min-height: auto;
+      margin: 10px 0;
     }
     .auth-image-side {
-      min-height: 280px;
+      min-height: 220px;
       width: 100%;
+    }
+    .auth-form-side {
+      padding: 30px 15px;
+    }
+    .auth-card {
+      padding: 30px 20px;
+      box-shadow: none;
     }
   }
 </style>
@@ -186,7 +197,7 @@
 <div class="auth-hero-section">
   <!-- Chap taraf: Yaponiyaga va Ta'lim/Kitobga mos chiroyli SVG tasviri -->
   <div class="auth-image-side">
-    <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+    <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; max-height: 350px;">
       <!-- Qizil Yapon Quyoshi -->
       <circle cx="250" cy="220" r="100" fill="#bc002d" opacity="0.85" />
 
@@ -205,7 +216,7 @@
         <text x="80" y="95" font-family="'Noto Sans JP', sans-serif" font-size="22" fill="#2a9d8f" font-weight="bold">日本語</text>
         <text x="80" y="125" font-family="'Noto Sans JP', sans-serif" font-size="16" fill="#e76f51">会話練習</text>
 
-        <text x="290" y="95" font-family="'Noto Sans JP', sans-serif" font-size="22" fill="#2a9d8f" font-weight="bold">ひらがな</text>
+        <text x="290" y="95" font-family="'Noto Sans JP', sans-serif" font-size: "22" fill="#2a9d8f" font-weight="bold">ひらがな</text>
         <text x="290" y="125" font-family="'Noto Sans JP', sans-serif" font-size="16" fill="#e76f51">カタカナ</text>
       </g>
 
