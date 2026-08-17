@@ -1,35 +1,1197 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ scenario.title }} · Practice{% endblock %}
+
+{% block title %}{{ scenario.title }} · Nihongo Talk Trainer{% endblock %}
+
 {% block content %}
-<div class="practice-top"><a class="back" href="{% url 'trainer:scenario_detail' scenario.pk %}">← <span data-i18n="back">Chiqish</span></a><span>Urinish #{{ progress.attempt_number }}</span></div>
-<div class="progress-meta"><div><b>{{ scenario.title }}</b><span>Qadam {{ step_number }} / {{ total_steps }}</span></div><div class="progress-track"><i style="width:{{ percent }}%"></i></div></div>
-<section class="dialog-card">
-  <div class="speaker"><div class="avatar">AI</div><div><b>{{ step.speaker }}</b><small data-i18n="audio">Yaponcha suhbat</small></div><button type="button" class="icon-btn" onclick="speakJapanese(document.getElementById('jp-text').innerText)" title="Tinglash">🔊</button></div>
-  <div class="jp-bubble"><div id="jp-text">{{ step.japanese_text }}</div><button type="button" class="listen" onclick="speakJapanese(document.getElementById('jp-text').innerText)">▶ <span data-i18n="listen">Eshitish</span></button></div>
-  <div class="study-lines">{% if step.romaji %}<span>Romaji: <b>{{ step.romaji }}</b></span>{% endif %}<span><span data-i18n="translate">Tarjima</span>: {{ step.translation }}</span></div>
-  {% if step.hint %}<div class="hint-box">💡 {{ step.hint }}</div>{% endif %}
-  <div class="answer-title"><span data-i18n="your_answer">Sizning javobingiz</span>{% if step.answer_type == "text" %}<button type="button" class="voice-answer" id="voiceBtn">🎙 Ovoz bilan aytish</button>{% endif %}</div>
-  <form method="post" id="answerForm">{% csrf_token %}
-  {% if step.answer_type == "choice" %}
-    <div class="choice-grid">{% for choice in choices %}<label class="choice"><input type="radio" name="choice" value="{{ choice.pk }}" required><span>{{ choice.text }}</span></label>{% endfor %}</div>
-  {% else %}
-    <input class="answer-input" id="answerInput" type="text" name="answer_text" autocomplete="off" placeholder="Yaponcha javobingizni yozing..." data-i18n-placeholder="your_answer" required autofocus>
-  {% endif %}
-  <button class="btn submit-answer" type="submit"><span data-i18n="checking">Javobni tekshirish</span> <span>→</span></button></form>
-</section>
-<div class="practice-tip">🎧 <b data-i18n="tip">Maslahat:</b> Avval “Eshitish” tugmasini bosing, keyin javobni yaponcha talaffuz qilishga harakat qiling.</div>
-{% endblock %}
-{% block scripts %}
-<script>
-const voiceBtn=document.getElementById('voiceBtn'), input=document.getElementById('answerInput');
-if(voiceBtn && input){
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SR){voiceBtn.disabled=true; voiceBtn.innerText='🎙 Ovoz qo‘llanmaydi';}
- else {const r=new SR(); r.lang='ja-JP'; r.interimResults=false; r.maxAlternatives=1;
- voiceBtn.onclick=()=>{r.start();voiceBtn.classList.add('recording');voiceBtn.innerText='⏺ Tinglanmoqda...'};
- r.onresult=e=>{input.value=e.results[0][0].transcript;};
- r.onend=()=>{voiceBtn.classList.remove('recording');voiceBtn.innerText='🎙 Ovoz bilan aytish'};}
+
+<style>
+/* =========================================================
+   NIHONGO TALK TRAINER — PRACTICE PAGE
+   ========================================================= */
+
+.practice-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 25px 0 60px;
 }
-document.querySelectorAll('.choice').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('.choice').forEach(y=>y.classList.remove('selected'));x.classList.add('selected')}));
+
+/* TOP */
+.practice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.practice-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #667085;
+    font-weight: 700;
+    transition: .25s;
+}
+
+.practice-back:hover {
+    color: #111827;
+    transform: translateX(-4px);
+}
+
+.attempt-badge {
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.8);
+    border: 1px solid #e5e7eb;
+    color: #667085;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 5px 20px rgba(0,0,0,.05);
+}
+
+/* SCENARIO INFO */
+.practice-info {
+    background:
+        radial-gradient(circle at 90% 10%, rgba(255,80,100,.14), transparent 30%),
+        linear-gradient(135deg, #ffffff, #fff8f8);
+    border: 1px solid #f0d9dc;
+    border-radius: 28px;
+    padding: 25px 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 15px 45px rgba(60, 20, 30, .08);
+}
+
+.practice-info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.practice-title {
+    margin: 0;
+    font-size: clamp(22px, 4vw, 32px);
+    color: #171717;
+    letter-spacing: -.7px;
+}
+
+.step-counter {
+    color: #8a1725;
+    font-weight: 800;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.progress-container {
+    margin-top: 18px;
+}
+
+.progress-background {
+    width: 100%;
+    height: 10px;
+    background: #eee;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: {{ percent }}%;
+    min-width: 2%;
+    background: linear-gradient(90deg, #8a1725, #d92d45, #ff6b81);
+    border-radius: 100px;
+    transition: width .6s ease;
+    box-shadow: 0 0 18px rgba(217,45,69,.35);
+}
+
+/* DIALOG CARD */
+.dialog-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255,255,255,.97);
+    border: 1px solid #ececec;
+    border-radius: 32px;
+    box-shadow:
+        0 25px 70px rgba(20,20,30,.10),
+        0 3px 12px rgba(20,20,30,.04);
+}
+
+.dialog-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg,#8a1725,#d92d45,#ff8a9b);
+}
+
+/* SENSEI */
+.sensei-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 27px 30px 20px;
+    gap: 15px;
+}
+
+.sensei-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sensei-avatar {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg,#8a1725,#c5223d);
+    color: white;
+    font-size: 25px;
+    font-weight: 900;
+    box-shadow: 0 10px 25px rgba(138,23,37,.25);
+    position: relative;
+}
+
+.sensei-avatar::after {
+    content: "🇯🇵";
+    position: absolute;
+    right: -9px;
+    bottom: -7px;
+    font-size: 20px;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,.15));
+}
+
+.sensei-name {
+    display: block;
+    font-size: 17px;
+    color: #171717;
+}
+
+.sensei-role {
+    display: block;
+    margin-top: 3px;
+    color: #8a8f98;
+    font-size: 13px;
+}
+
+.sound-button {
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 16px;
+    background: #fff1f2;
+    color: #9f1239;
+    cursor: pointer;
+    font-size: 20px;
+    transition: .25s;
+}
+
+.sound-button:hover {
+    transform: scale(1.08);
+    background: #ffe4e6;
+    box-shadow: 0 8px 25px rgba(159,18,57,.16);
+}
+
+.sound-button.playing {
+    animation: pulseSound 1s infinite;
+}
+
+@keyframes pulseSound {
+    0%,100% {
+        box-shadow: 0 0 0 0 rgba(217,45,69,.25);
+    }
+    50% {
+        box-shadow: 0 0 0 12px rgba(217,45,69,0);
+    }
+}
+
+/* JAPANESE SPEECH */
+.japanese-area {
+    margin: 0 30px;
+    padding: 35px 25px;
+    text-align: center;
+    border-radius: 25px;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.8), transparent 25%),
+        linear-gradient(135deg,#fff6f7,#fffafa);
+    border: 1px solid #f6dadd;
+}
+
+.jp-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: white;
+    color: #9f1239;
+    border: 1px solid #f4d4d8;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.jp-text {
+    margin: 0;
+    color: #171717;
+    font-size: clamp(28px, 5vw, 48px);
+    line-height: 1.5;
+    font-weight: 800;
+    letter-spacing: .5px;
+    word-break: break-word;
+}
+
+.listen-button {
+    margin-top: 23px;
+    border: 0;
+    padding: 11px 18px;
+    border-radius: 999px;
+    background: #171717;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.listen-button:hover {
+    transform: translateY(-2px);
+    background: #8a1725;
+    box-shadow: 0 10px 25px rgba(138,23,37,.2);
+}
+
+/* STUDY INFORMATION */
+.study-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 30px 0;
+}
+
+.study-box {
+    padding: 15px 17px;
+    border-radius: 17px;
+    background: #fafafa;
+    border: 1px solid #eee;
+}
+
+.study-label {
+    display: block;
+    font-size: 11px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.study-value {
+    color: #363b44;
+    line-height: 1.6;
+}
+
+/* HINT */
+.hint {
+    margin: 20px 30px 0;
+    padding: 15px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg,#fffbea,#fff7d6);
+    border: 1px solid #f5df8a;
+    color: #795600;
+}
+
+.hint strong {
+    margin-right: 5px;
+}
+
+/* ANSWER AREA */
+.answer-area {
+    padding: 28px 30px 32px;
+}
+
+.answer-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.answer-heading h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #171717;
+}
+
+.voice-answer {
+    border: 1px solid #e8c8ce;
+    background: #fff7f8;
+    color: #9f1239;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.voice-answer:hover {
+    transform: translateY(-2px);
+    background: #ffecef;
+}
+
+.voice-answer.recording {
+    background: #9f1239;
+    color: white;
+    border-color: #9f1239;
+    animation: recordingPulse 1s infinite;
+}
+
+@keyframes recordingPulse {
+    0%,100% {
+        box-shadow: 0 0 0 0 rgba(159,18,57,.25);
+    }
+    50% {
+        box-shadow: 0 0 0 9px rgba(159,18,57,0);
+    }
+}
+
+/* CHOICES */
+.choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+.choice {
+    position: relative;
+    cursor: pointer;
+}
+
+.choice input {
+    position: absolute;
+    opacity: 0;
+}
+
+.choice-content {
+    display: flex;
+    align-items: center;
+    min-height: 62px;
+    padding: 15px 18px;
+    border: 2px solid #ececec;
+    border-radius: 17px;
+    background: white;
+    transition: .25s;
+    font-weight: 650;
+    color: #363b44;
+}
+
+.choice:hover .choice-content {
+    border-color: #dca6ae;
+    background: #fffafb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30,20,20,.07);
+}
+
+.choice input:checked + .choice-content {
+    border-color: #a61b2b;
+    background: #fff2f4;
+    color: #8a1725;
+    box-shadow: 0 10px 25px rgba(166,27,43,.10);
+}
+
+.choice input:checked + .choice-content::before {
+    content: "✓";
+    margin-right: 10px;
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #a61b2b;
+    color: white;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* TEXT INPUT */
+.answer-input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 64px;
+    padding: 17px 20px;
+    border: 2px solid #e6e7eb;
+    border-radius: 17px;
+    outline: none;
+    font-size: 17px;
+    color: #171717;
+    background: #fff;
+    transition: .25s;
+}
+
+.answer-input:focus {
+    border-color: #a61b2b;
+    box-shadow: 0 0 0 5px rgba(166,27,43,.08);
+}
+
+/* SUBMIT */
+.submit-button {
+    width: 100%;
+    margin-top: 20px;
+    min-height: 60px;
+    border: 0;
+    border-radius: 17px;
+    background: linear-gradient(135deg,#8a1725,#c5223d);
+    color: white;
+    font-size: 17px;
+    font-weight: 850;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(138,23,37,.22);
+    transition: .25s;
+}
+
+.submit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 17px 35px rgba(138,23,37,.3);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+/* BOTTOM TIP */
+.practice-tip {
+    margin-top: 20px;
+    padding: 17px 20px;
+    border-radius: 18px;
+    background: #f8fafc;
+    border: 1px solid #e7eaf0;
+    color: #687080;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+
+    .practice-page {
+        padding: 15px 0 40px;
+    }
+
+    .practice-header {
+        align-items: flex-start;
+    }
+
+    .practice-info {
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .practice-info-top {
+        align-items: flex-start;
+    }
+
+    .practice-title {
+        font-size: 22px;
+    }
+
+    .dialog-card {
+        border-radius: 23px;
+    }
+
+    .sensei-header {
+        padding: 22px 20px 16px;
+    }
+
+    .japanese-area {
+        margin: 0 15px;
+        padding: 28px 15px;
+        border-radius: 20px;
+    }
+
+    .jp-text {
+        font-size: 29px;
+    }
+
+    .study-info {
+        grid-template-columns: 1fr;
+        margin: 15px;
+    }
+
+    .hint {
+        margin: 15px;
+    }
+
+    .answer-area {
+        padding: 22px 15px 25px;
+    }
+
+    .answer-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .voice-answer {
+        width: 100%;
+    }
+
+    .choice-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .attempt-badge {
+        font-size: 12px;
+        padding: 7px 10px;
+    }
+}
+</style>
+
+
+<div class="practice-page">
+
+    <!-- TOP -->
+    <div class="practice-header">
+
+        <a class="practice-back"
+           href="{% url 'trainer:scenario_detail' scenario.pk %}">
+            ←
+            <span data-i18n="back">Chiqish</span>
+        </a>
+
+        <div class="attempt-badge">
+            🎯 Urinish #{{ progress.attempt_number }}
+        </div>
+
+    </div>
+
+
+    <!-- SCENARIO INFO -->
+    <section class="practice-info">
+
+        <div class="practice-info-top">
+
+            <div>
+                <h1 class="practice-title">
+                    {{ scenario.emoji }} {{ scenario.title }}
+                </h1>
+            </div>
+
+            <div class="step-counter">
+                QADAM {{ step_number }} / {{ total_steps }}
+            </div>
+
+        </div>
+
+        <div class="progress-container">
+
+            <div class="progress-background">
+                <div class="progress-fill"></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DIALOG -->
+    <section class="dialog-card">
+
+        <!-- SENSEI -->
+        <div class="sensei-header">
+
+            <div class="sensei-left">
+
+                <div class="sensei-avatar">
+                    AI
+                </div>
+
+                <div>
+                    <span class="sensei-name">
+                        {{ step.speaker }}
+                    </span>
+
+                    <span class="sensei-role">
+                        🇯🇵 Japanese Conversation Sensei
+                    </span>
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="sound-button"
+                id="mainSoundButton"
+                onclick="speakJapanese()"
+                title="Yaponcha tinglash">
+                🔊
+            </button>
+
+        </div>
+
+
+        <!-- JAPANESE TEXT -->
+        <div class="japanese-area">
+
+            <div class="jp-label">
+                🇯🇵 日本語 · JAPANESE
+            </div>
+
+            <p
+                id="jp-text"
+                class="jp-text">{{ step.japanese_text }}</p>
+
+            <button
+                type="button"
+                class="listen-button"
+                onclick="speakJapanese()">
+
+                🔊
+                <span data-i18n="listen">
+                    Eshitish
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- ROMAJI + TRANSLATION -->
+        <div class="study-info">
+
+            {% if step.romaji %}
+            <div class="study-box">
+
+                <span class="study-label">
+                    🔤 Romaji
+                </span>
+
+                <div class="study-value">
+                    {{ step.romaji }}
+                </div>
+
+            </div>
+            {% endif %}
+
+
+            {% if step.translation %}
+            <div class="study-box">
+
+                <span class="study-label">
+                    🌍 Tarjima
+                </span>
+
+                <div class="study-value">
+                    {{ step.translation }}
+                </div>
+
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- HINT -->
+        {% if step.hint %}
+        <div class="hint">
+
+            💡
+            <strong data-i18n="hint">
+                Maslahat
+            </strong>
+
+            {{ step.hint }}
+
+        </div>
+        {% endif %}
+
+
+        <!-- ANSWER -->
+        <div class="answer-area">
+
+            <div class="answer-heading">
+
+                <h3 data-i18n="your_answer">
+                    Sizning javobingiz
+                </h3>
+
+                {% if step.answer_type == "text" %}
+
+                <button
+                    type="button"
+                    class="voice-answer"
+                    id="voiceBtn">
+
+                    🎙
+                    <span id="voiceText">
+                        Ovoz bilan javob berish
+                    </span>
+
+                </button>
+
+                {% endif %}
+
+            </div>
+
+
+            <form
+                method="post"
+                id="answerForm">
+
+                {% csrf_token %}
+
+
+                {% if step.answer_type == "choice" %}
+
+                    <div class="choice-grid">
+
+                        {% for choice in choices %}
+
+                        <label class="choice">
+
+                            <input
+                                type="radio"
+                                name="choice"
+                                value="{{ choice.pk }}"
+                                required>
+
+                            <span class="choice-content">
+                                {{ choice.text }}
+                            </span>
+
+                        </label>
+
+                        {% empty %}
+
+                        <div class="practice-tip">
+                            ⚠️ Bu savol uchun hali javob variantlari qo‘shilmagan.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <input
+                        class="answer-input"
+                        id="answerInput"
+                        type="text"
+                        name="answer_text"
+                        autocomplete="off"
+                        placeholder="日本語で答えてください..."
+                        required
+                        autofocus>
+
+                {% endif %}
+
+
+                <button
+                    class="submit-button"
+                    type="submit">
+
+                    <span data-i18n="checking">
+                        Javobni tekshirish
+                    </span>
+
+                    <span style="margin-left:8px;">
+                        →
+                    </span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- TIP -->
+    <div class="practice-tip">
+
+        🎧
+        <strong data-i18n="tip">
+            Maslahat:
+        </strong>
+
+        Avval
+        <b>“Eshitish”</b>
+        tugmasini bosing.
+
+        Yaponcha gapni tinglang va keyin javobni
+        yaponcha aytishga yoki yozishga harakat qiling.
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+/* =========================================================
+   NIHONGO TALK TRAINER — VOICE SYSTEM
+   ========================================================= */
+
+(function () {
+
+    const jpText = document.getElementById("jp-text");
+    const soundButton = document.getElementById("mainSoundButton");
+
+    /*
+     * YAPONCHA MATNNI OVOZGA AYLANTIRISH
+     */
+    window.speakJapanese = function () {
+
+        if (!jpText) {
+            return;
+        }
+
+        if (!("speechSynthesis" in window)) {
+            alert(
+                "Brauzeringiz ovozli funksiyani qo‘llab-quvvatlamaydi."
+            );
+            return;
+        }
+
+        const text = jpText.innerText.trim();
+
+        if (!text) {
+            return;
+        }
+
+        speechSynthesis.cancel();
+
+        const utterance =
+            new SpeechSynthesisUtterance(text);
+
+        utterance.lang = "ja-JP";
+        utterance.rate = 0.82;
+        utterance.pitch = 1.05;
+        utterance.volume = 1;
+
+        /*
+         * Yaponcha voice qidiramiz
+         */
+        const voices = speechSynthesis.getVoices();
+
+        const japaneseVoice =
+            voices.find(function (voice) {
+
+                return voice.lang &&
+                    voice.lang
+                        .toLowerCase()
+                        .startsWith("ja");
+
+            });
+
+        if (japaneseVoice) {
+            utterance.voice = japaneseVoice;
+        }
+
+        if (soundButton) {
+            soundButton.classList.add("playing");
+        }
+
+        utterance.onend = function () {
+
+            if (soundButton) {
+                soundButton.classList.remove("playing");
+            }
+
+        };
+
+        utterance.onerror = function () {
+
+            if (soundButton) {
+                soundButton.classList.remove("playing");
+            }
+
+        };
+
+        speechSynthesis.speak(utterance);
+
+    };
+
+
+    /*
+     * BRAUZER VOICE LARINI YUKLASH
+     */
+    if ("speechSynthesis" in window) {
+
+        speechSynthesis.onvoiceschanged = function () {
+            speechSynthesis.getVoices();
+        };
+
+    }
+
+
+    /* =====================================================
+       MICROPHONE / SPEECH RECOGNITION
+       ===================================================== */
+
+    const voiceBtn =
+        document.getElementById("voiceBtn");
+
+    const answerInput =
+        document.getElementById("answerInput");
+
+    const voiceText =
+        document.getElementById("voiceText");
+
+
+    if (voiceBtn && answerInput) {
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+
+        /*
+         * Chrome / Edge qo‘llab-quvvatlamasa
+         */
+        if (!SpeechRecognition) {
+
+            voiceBtn.disabled = true;
+
+            voiceText.innerText =
+                "Brauzer ovozni qo‘llamaydi";
+
+            voiceBtn.style.opacity = ".55";
+            voiceBtn.style.cursor = "not-allowed";
+
+        }
+
+        else {
+
+            const recognition =
+                new SpeechRecognition();
+
+            recognition.lang = "ja-JP";
+
+            recognition.interimResults = false;
+
+            recognition.continuous = false;
+
+            recognition.maxAlternatives = 3;
+
+
+            /*
+             * MICROPHONE BOSHLANDI
+             */
+            voiceBtn.addEventListener(
+                "click",
+                function () {
+
+                    try {
+
+                        recognition.start();
+
+                        voiceBtn.classList.add(
+                            "recording"
+                        );
+
+                        voiceText.innerText =
+                            "Tinglanmoqda...";
+
+                    }
+
+                    catch (error) {
+
+                        console.log(
+                            "Microphone:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * NATIJA
+             */
+            recognition.addEventListener(
+                "result",
+                function (event) {
+
+                    if (
+                        event.results &&
+                        event.results[0]
+                    ) {
+
+                        const transcript =
+                            event.results[0][0]
+                                .transcript;
+
+                        answerInput.value =
+                            transcript;
+
+                        answerInput.focus();
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * TUGADI
+             */
+            recognition.addEventListener(
+                "end",
+                function () {
+
+                    voiceBtn.classList.remove(
+                        "recording"
+                    );
+
+                    voiceText.innerText =
+                        "Ovoz bilan javob berish";
+
+                }
+            );
+
+
+            /*
+             * ERROR
+             */
+            recognition.addEventListener(
+                "error",
+                function (event) {
+
+                    console.log(
+                        "Speech recognition error:",
+                        event.error
+                    );
+
+                    voiceBtn.classList.remove(
+                        "recording"
+                    );
+
+                    if (
+                        event.error ===
+                        "not-allowed"
+                    ) {
+
+                        voiceText.innerText =
+                            "Mikrofonga ruxsat bering";
+
+                    }
+
+                    else {
+
+                        voiceText.innerText =
+                            "Qayta urinib ko‘ring";
+
+                    }
+
+                    setTimeout(function () {
+
+                        voiceText.innerText =
+                            "Ovoz bilan javob berish";
+
+                    }, 2500);
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CHOICE ANIMATION
+       ===================================================== */
+
+    const choices =
+        document.querySelectorAll(
+            ".choice input"
+        );
+
+    choices.forEach(function (input) {
+
+        input.addEventListener(
+            "change",
+            function () {
+
+                choices.forEach(function (other) {
+
+                    const label =
+                        other.closest(".choice");
+
+                    if (label) {
+                        label.style.transform =
+                            "scale(1)";
+                    }
+
+                });
+
+                const current =
+                    input.closest(".choice");
+
+                if (current) {
+
+                    current.style.transform =
+                        "scale(1.015)";
+
+                }
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       FORM SUBMIT PROTECTION
+       ===================================================== */
+
+    const answerForm =
+        document.getElementById("answerForm");
+
+    if (answerForm) {
+
+        answerForm.addEventListener(
+            "submit",
+            function () {
+
+                const submitButton =
+                    answerForm.querySelector(
+                        ".submit-button"
+                    );
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.style.opacity =
+                        ".75";
+
+                    submitButton.innerHTML =
+                        "⏳ Tekshirilmoqda...";
+
+                }
+
+            }
+        );
+
+    }
+
+
+})();
+
 </script>
+
 {% endblock %}
