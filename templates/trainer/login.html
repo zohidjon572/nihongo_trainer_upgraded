@@ -1,41 +1,413 @@
 {% extends 'trainer/base.html' %}
 
-{% block title %}Tizimga kirish | Nihongo Trainer{% endblock %}
+{% block title %}Kirish | Nihongo Trainer{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center my-5">
-    <div class="col-md-5">
-        <div class="card shadow-lg border-0 rounded-3">
-            <div class="card-body p-4">
-                <h3 class="text-center font-weight-bold mb-4 text-primary">Tizimga kirish</h3>
 
-                {% if form.errors %}
-                    <div class="alert alert-danger text-center p-2 small">
-                        Foydalanuvchi nomi yoki parol xato!
-                    </div>
-                {% endif %}
+<style>
+    .nihongo-login-page {
+        min-height: calc(100vh - 70px);
+        background:
+            radial-gradient(circle at 10% 20%, rgba(188, 0, 45, 0.05), transparent 25%),
+            #f8f8f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px 20px;
+    }
 
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="id_username" class="form-label fw-bold">Foydalanuvchi nomi</label>
-                        <input type="text" name="username" class="form-control" id="id_username" placeholder="Username kiriting" required autofocus>
-                    </div>
+    .nihongo-login-wrapper {
+        width: 100%;
+        max-width: 900px;
+        min-height: 530px;
+        display: grid;
+        grid-template-columns: 42% 58%;
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.09);
+        border: 1px solid #eeeeea;
+    }
 
-                    <div class="mb-4">
-                        <label for="id_password" class="form-label fw-bold">Parol</label>
-                        <input type="password" name="password" class="form-control" id="id_password" placeholder="Parolni kiriting" required>
-                    </div>
+    /* LEFT SIDE */
 
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Kirish</button>
-                </form>
+    .nihongo-login-intro {
+        position: relative;
+        background: #1f1f1f;
+        color: white;
+        padding: 55px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+    }
 
-                <div class="text-center mt-3">
-                    <small class="text-muted">Hisobingiz yo'qmi? <a href="{% url 'trainer:register' %}" class="text-decoration-none fw-bold">Ro'yxatdan o'ting</a></small>
+    .nihongo-login-intro::before {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 50%;
+        right: -100px;
+        top: -80px;
+    }
+
+    .nihongo-login-intro::after {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 50%;
+        left: -180px;
+        bottom: -160px;
+    }
+
+    .japan-mark {
+        position: relative;
+        z-index: 2;
+        width: 72px;
+        height: 72px;
+        background: #bc002d;
+        border-radius: 50%;
+        margin-bottom: 35px;
+        box-shadow: 0 10px 30px rgba(188, 0, 45, 0.3);
+    }
+
+    .intro-japanese {
+        position: relative;
+        z-index: 2;
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: #d6d6d6;
+        margin-bottom: 12px;
+    }
+
+    .intro-title {
+        position: relative;
+        z-index: 2;
+        font-size: 38px;
+        line-height: 1.25;
+        font-weight: 700;
+        margin: 0 0 18px;
+    }
+
+    .intro-title span {
+        color: #bc002d;
+    }
+
+    .intro-description {
+        position: relative;
+        z-index: 2;
+        color: #bdbdbd;
+        font-size: 14px;
+        line-height: 1.8;
+        max-width: 290px;
+        margin: 0;
+    }
+
+    .intro-bottom {
+        position: relative;
+        z-index: 2;
+        color: #888;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* RIGHT SIDE */
+
+    .nihongo-login-form {
+        padding: 55px 65px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-heading {
+        margin-bottom: 32px;
+    }
+
+    .form-heading h2 {
+        font-size: 27px;
+        font-weight: 700;
+        color: #222;
+        margin: 0 0 8px;
+    }
+
+    .form-heading p {
+        margin: 0;
+        color: #999;
+        font-size: 13px;
+    }
+
+    .nihongo-field {
+        margin-bottom: 21px;
+    }
+
+    .nihongo-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .nihongo-field label small {
+        display: block;
+        font-size: 10px;
+        color: #aaa;
+        font-weight: 400;
+        margin-top: 2px;
+        letter-spacing: 1px;
+    }
+
+    .nihongo-input {
+        width: 100%;
+        height: 51px;
+        border: 1px solid #deded9;
+        background: #fafaf8;
+        border-radius: 10px;
+        padding: 0 15px;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    .nihongo-input:focus {
+        background: #fff;
+        border-color: #bc002d;
+        box-shadow: 0 0 0 4px rgba(188, 0, 45, 0.07);
+    }
+
+    .nihongo-input::placeholder {
+        color: #b5b5b5;
+    }
+
+    .nihongo-login-btn {
+        width: 100%;
+        height: 52px;
+        border: none;
+        border-radius: 10px;
+        background: #bc002d;
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 5px;
+    }
+
+    .nihongo-login-btn:hover {
+        background: #9f0026;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(188, 0, 45, 0.2);
+    }
+
+    .nihongo-error {
+        background: #fff3f4;
+        color: #a00025;
+        border: 1px solid #ffd9de;
+        border-radius: 9px;
+        padding: 10px 12px;
+        font-size: 12px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .nihongo-register {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 22px;
+        border-top: 1px solid #eeeeea;
+        color: #999;
+        font-size: 13px;
+    }
+
+    .nihongo-register a {
+        color: #bc002d;
+        font-weight: 700;
+        text-decoration: none;
+        margin-left: 4px;
+    }
+
+    .nihongo-register a:hover {
+        text-decoration: underline;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 768px) {
+
+        .nihongo-login-wrapper {
+            grid-template-columns: 1fr;
+            max-width: 470px;
+        }
+
+        .nihongo-login-intro {
+            min-height: 230px;
+            padding: 32px;
+        }
+
+        .japan-mark {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        .intro-title {
+            font-size: 27px;
+        }
+
+        .intro-description {
+            display: none;
+        }
+
+        .intro-bottom {
+            display: none;
+        }
+
+        .nihongo-login-form {
+            padding: 40px 30px;
+        }
+    }
+
+    @media (max-width: 450px) {
+
+        .nihongo-login-page {
+            padding: 25px 12px;
+        }
+
+        .nihongo-login-form {
+            padding: 35px 22px;
+        }
+    }
+</style>
+
+
+<div class="nihongo-login-page">
+
+    <div class="nihongo-login-wrapper">
+
+        <!-- LEFT -->
+        <div class="nihongo-login-intro">
+
+            <div>
+                <div class="japan-mark"></div>
+
+                <div class="intro-japanese">
+                    日本語を学ぼう
                 </div>
+
+                <h1 class="intro-title">
+                    Yapon tilini<br>
+                    <span>birga</span> o‘rganamiz.
+                </h1>
+
+                <p class="intro-description">
+                    Nihongo Trainer orqali yapon tilini
+                    o‘rganing, suhbat qiling va har kuni
+                    yangi bilimlarga ega bo‘ling.
+                </p>
             </div>
+
+            <div class="intro-bottom">
+                NIHONGO TRAINER　•　日本語学習
+            </div>
+
         </div>
+
+
+        <!-- RIGHT -->
+        <div class="nihongo-login-form">
+
+            <div class="form-heading">
+
+                <h2>Xush kelibsiz</h2>
+
+                <p>
+                    Hisobingizga kirish uchun ma’lumotlarni kiriting.
+                </p>
+
+            </div>
+
+
+            {% if form.errors %}
+                <div class="nihongo-error">
+                    Foydalanuvchi nomi yoki parol noto‘g‘ri.
+                </div>
+            {% endif %}
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <!-- USERNAME -->
+                <div class="nihongo-field">
+
+                    <label for="id_username">
+                        Foydalanuvchi nomi
+                        <small>ユーザー名</small>
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        class="nihongo-input"
+                        placeholder="Username kiriting"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+                <div class="nihongo-field">
+
+                    <label for="id_password">
+                        Parol
+                        <small>パスワード</small>
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        class="nihongo-input"
+                        placeholder="Parolingizni kiriting"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="nihongo-login-btn"
+                >
+                    Kirish　→
+                </button>
+
+            </form>
+
+
+            <div class="nihongo-register">
+
+                Hisobingiz yo‘qmi?
+
+                <a href="{% url 'trainer:register' %}">
+                    Ro‘yxatdan o‘ting
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>
+
 {% endblock %}
