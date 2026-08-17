@@ -4,516 +4,540 @@
 {% block content %}
 <style>
   /* ==========================================================================
-     SCENARIO LIST / PRACTICE LIBRARY - JAPANESE ZEN STYLE
+     SCENARIO LIST / PRACTICE LIBRARY - JAPANESE MODERN ZEN (SHOJIS & INKAN)
      ========================================================================== */
-  
-  /* Hero Section */
-  .hero {
-    background: linear-gradient(135deg, #182335 0%, #0F172A 100%);
-    color: #FFFFFF;
-    border-radius: var(--radius-md, 16px);
-    padding: 3rem 2.5rem;
+
+  /* Hero Section: Japanese Calligraphy & Stamp Style */
+  .hero-zen {
+    background: #11141A;
+    color: #FDFBF7;
+    border-radius: 20px;
+    padding: 3.5rem 3rem;
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow-elevated, 0 12px 30px rgba(18, 19, 22, 0.08));
-    border: 1px solid var(--color-border, #E8E5DF);
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
   }
 
-  .hero::before {
-    content: "";
+  .hero-zen::after {
+    content: "日本語";
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(200, 16, 46, 0.15) 0%, transparent 70%);
+    right: 5%;
+    bottom: -15px;
+    font-family: var(--font-japanese, 'Shippori Mincho', serif);
+    font-size: 8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.03);
+    letter-spacing: 0.1em;
     pointer-events: none;
+    user-select: none;
   }
 
-  .hero .eyebrow {
+  .hero-content {
+    max-width: 580px;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--color-gold, #D4AF37);
-    display: block;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.18em;
+    color: #D4AF37;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
   }
 
-  .hero h1 {
-    font-size: 2.2rem;
+  .hero-zen h1 {
+    font-size: 2.4rem;
     font-weight: 800;
-    line-height: 1.25;
-    margin-bottom: 0.75rem;
+    line-height: 1.2;
     letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    color: #FFFFFF;
   }
 
-  .hero h1 em {
-    font-style: normal;
-    color: #FF8A9A;
-    border-bottom: 2px solid var(--color-vermilion, #C8102E);
+  .hero-zen h1 span {
+    color: #C8102E;
+    position: relative;
+    display: inline-block;
   }
 
-  .hero p {
-    color: #94A3B8;
+  .hero-zen p {
+    color: #A0AEC0;
     font-size: 1rem;
-    max-width: 520px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
 
-  .hero-orb {
-    width: 90px;
-    height: 90px;
-    background: var(--color-vermilion, #C8102E);
-    border-radius: 50%;
+  /* Hanko / Inkan Red Stamp Emblem */
+  .hero-hanko {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #C8102E;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #C8102E;
     font-family: var(--font-japanese, 'Shippori Mincho', serif);
-    font-size: 2rem;
-    font-weight: bold;
-    color: #FFFFFF;
-    box-shadow: 0 0 30px rgba(200, 16, 46, 0.4);
+    font-weight: 700;
+    transform: rotate(-6deg);
+    box-shadow: 0 0 25px rgba(200, 16, 46, 0.25);
+    background: rgba(200, 16, 46, 0.04);
+    z-index: 2;
     flex-shrink: 0;
+  }
+
+  .hero-hanko .kanji {
+    font-size: 2.2rem;
     line-height: 1;
-    text-align: center;
   }
 
-  .hero-orb small {
-    font-size: 0.75rem;
-    font-weight: normal;
-    margin-top: 2px;
-    opacity: 0.9;
+  .hero-hanko .label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+    text-transform: uppercase;
   }
 
-  /* Dashboard Stats Grid */
-  .dashboard-stats {
+  /* Dashboard Metrics Grid */
+  .stats-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.25rem;
     margin-bottom: 2.5rem;
   }
 
-  .dashboard-stats > div {
-    background: var(--color-surface, #FFFFFF);
-    border: 1px solid var(--color-border, #E8E5DF);
-    border-radius: var(--radius-md, 14px);
+  .stat-card {
+    background: #FFFFFF;
+    border: 1px solid #E8E5DF;
+    border-radius: 16px;
     padding: 1.25rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
-    transition: transform 0.2s ease;
+    gap: 1.2rem;
+    transition: all 0.25s ease;
   }
 
-  .dashboard-stats > div:hover {
+  .stat-card:hover {
+    border-color: #121316;
     transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
   }
 
-  .dashboard-stats span {
-    font-size: 1.8rem;
-    background: var(--color-hover, #F3EFEA);
-    width: 48px;
-    height: 48px;
+  .stat-icon {
+    width: 52px;
+    height: 52px;
+    background: #F8F6F0;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    font-size: 1.6rem;
   }
 
-  .dashboard-stats strong {
+  .stat-data strong {
     display: block;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: var(--color-sumi, #121316);
-    line-height: 1.2;
+    color: #121316;
+    line-height: 1.1;
   }
 
-  .dashboard-stats small {
+  .stat-data small {
     font-size: 0.82rem;
-    color: var(--color-slate, #5A626A);
+    color: #718096;
     font-weight: 500;
   }
 
-  /* Filters Bar */
-  .filters {
-    background: var(--color-paper, #FDFBF7);
-    border: 1px solid var(--color-border, #E8E5DF);
+  /* Shoji Filter Bar */
+  .filter-shoji {
+    background: #FDFBF7;
+    border: 1px solid #E8E5DF;
+    border-radius: 16px;
     padding: 1rem 1.25rem;
-    border-radius: var(--radius-md, 14px);
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     align-items: center;
-    margin-bottom: 2.5rem;
-    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
-  }
-
-  .filters .search {
-    flex: 1;
-    min-width: 240px;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .filters .search span {
-    position: absolute;
-    left: 1rem;
-    color: var(--color-slate, #5A626A);
-    font-size: 1.1rem;
-  }
-
-  .filters .search input {
-    width: 100%;
-    padding: 0.7rem 1rem 0.7rem 2.6rem;
-    border: 1px solid var(--color-border, #E8E5DF);
-    border-radius: var(--radius-pill, 9999px);
-    font-family: inherit;
-    font-size: 0.9rem;
-    background: #FFFFFF;
-    color: var(--color-sumi, #121316);
-    outline: none;
-    transition: all 0.2s ease;
-  }
-
-  .filters .search input:focus {
-    border-color: var(--color-sumi, #121316);
-    box-shadow: 0 0 0 3px rgba(18, 19, 22, 0.06);
-  }
-
-  .filters select {
-    padding: 0.7rem 1.2rem;
-    border: 1px solid var(--color-border, #E8E5DF);
-    border-radius: var(--radius-pill, 9999px);
-    font-family: inherit;
-    font-size: 0.9rem;
-    background: #FFFFFF;
-    color: var(--color-sumi, #121316);
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease;
-  }
-
-  .filters select:focus {
-    border-color: var(--color-sumi, #121316);
-  }
-
-  .filters .btn {
-    background: var(--color-sumi, #121316);
-    color: #FFFFFF;
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: var(--radius-pill, 9999px);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .filters .btn:hover {
-    background: var(--color-vermilion, #C8102E);
-  }
-
-  /* Section Header */
-  .section-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--color-border, #E8E5DF);
-  }
-
-  .section-head .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: var(--color-vermilion, #C8102E);
-    display: block;
-  }
-
-  .section-head h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--color-sumi, #121316);
-  }
-
-  .section-head .count {
-    font-size: 0.85rem;
-    font-weight: 700;
-    background: var(--color-hover, #F3EFEA);
-    color: var(--color-sumi, #121316);
-    padding: 4px 12px;
-    border-radius: var(--radius-pill, 9999px);
-  }
-
-  /* Scenario Grid & Cards */
-  .scenario-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 1.5rem;
     margin-bottom: 3rem;
   }
 
-  .scenario-card {
+  .search-box {
+    flex: 1;
+    min-width: 260px;
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid #E8E5DF;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
     background: #FFFFFF;
-    border: 1px solid var(--color-border, #E8E5DF);
-    border-radius: var(--radius-md, 14px);
+    color: #121316;
+    transition: all 0.2s ease;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: #121316;
+    box-shadow: 0 0 0 3px rgba(18, 19, 22, 0.05);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #A0AEC0;
+  }
+
+  .select-custom {
+    padding: 0.75rem 1.25rem;
+    border: 1px solid #E8E5DF;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    background: #FFFFFF;
+    color: #121316;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .select-custom:focus {
+    border-color: #121316;
+  }
+
+  .btn-filter {
+    background: #121316;
+    color: #FFFFFF;
+    border: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-filter:hover {
+    background: #C8102E;
+  }
+
+  /* Library Grid Section */
+  .grid-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #121316;
+  }
+
+  .grid-header h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #121316;
+    letter-spacing: -0.01em;
+  }
+
+  .badge-count {
+    background: #C8102E;
+    color: #FFFFFF;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 99px;
+  }
+
+  /* Scenario Cards */
+  .scenarios-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.75rem;
+    margin-bottom: 4rem;
+  }
+
+  .zen-card {
+    background: #FFFFFF;
+    border: 1px solid #E8E5DF;
+    border-radius: 16px;
     padding: 1.75rem;
     display: flex;
     flex-direction: column;
     position: relative;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
   }
 
-  .scenario-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-elevated, 0 12px 30px rgba(18, 19, 22, 0.08));
-    border-color: rgba(18, 19, 22, 0.2);
+  .zen-card:hover {
+    transform: translateY(-5px);
+    border-color: #C8102E;
+    box-shadow: 0 15px 35px rgba(200, 16, 46, 0.08);
   }
 
-  .scenario-icon {
-    font-size: 2.2rem;
-    margin-bottom: 1rem;
-    background: var(--color-paper, #FDFBF7);
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-emoji {
+    font-size: 2rem;
     width: 56px;
     height: 56px;
+    background: #FDFBF7;
+    border: 1px solid #E8E5DF;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    border: 1px solid var(--color-border, #E8E5DF);
   }
 
-  .chips {
+  .card-tags {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.85rem;
+    gap: 0.4rem;
   }
 
-  .chips span {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: var(--radius-pill, 9999px);
-    background: var(--color-hover, #F3EFEA);
-    color: var(--color-sumi, #121316);
-  }
-
-  .scenario-card h3 {
-    font-size: 1.2rem;
+  .tag-pill {
+    font-size: 0.72rem;
     font-weight: 700;
-    color: var(--color-sumi, #121316);
-    margin-bottom: 0.5rem;
-    line-height: 1.35;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #F3EFEA;
+    color: #4A5568;
   }
 
-  .scenario-card p {
-    font-size: 0.9rem;
-    color: var(--color-slate, #5A626A);
-    line-height: 1.5;
-    margin-bottom: 1.25rem;
+  .zen-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #121316;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+
+  .zen-card p {
+    font-size: 0.92rem;
+    color: #718096;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
     flex: 1;
   }
 
-  .meta {
+  .card-footer-meta {
     display: flex;
-    gap: 1rem;
-    font-size: 0.82rem;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px dashed #E8E5DF;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    color: #718096;
     font-weight: 600;
-    color: var(--color-slate, #5A626A);
-    margin-bottom: 1rem;
-    padding-top: 0.85rem;
-    border-top: 1px dashed var(--color-border, #E8E5DF);
   }
 
-  .last-score {
-    font-size: 0.82rem;
-    color: #2E7D32;
+  .score-badge {
     background: rgba(46, 125, 50, 0.08);
+    color: #2E7D32;
     padding: 6px 12px;
-    border-radius: var(--radius-sm, 8px);
-    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
 
-  .last-score b {
-    font-weight: 800;
-  }
-
-  .scenario-card .btn.full {
-    display: block;
-    width: 100%;
-    text-align: center;
+  .action-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     text-decoration: none;
-    background: var(--color-sumi, #121316);
+    background: #121316;
     color: #FFFFFF;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-pill, 9999px);
+    padding: 0.85rem;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     transition: all 0.25s ease;
   }
 
-  .scenario-card .btn.full:hover {
-    background: var(--color-vermilion, #C8102E);
+  .action-link:hover {
+    background: #C8102E;
   }
 
-  /* Empty State */
-  .empty {
+  /* Empty Box State */
+  .empty-box {
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
     background: #FFFFFF;
-    border: 1px dashed var(--color-border, #E8E5DF);
-    border-radius: var(--radius-md, 14px);
+    border: 2px dashed #E8E5DF;
+    border-radius: 16px;
   }
 
-  .empty div {
+  .empty-box .icon {
     font-size: 3rem;
     margin-bottom: 1rem;
   }
 
-  .empty h3 {
-    font-size: 1.25rem;
-    color: var(--color-sumi, #121316);
-    margin-bottom: 0.25rem;
-  }
-
-  .empty p {
-    color: var(--color-slate, #5A626A);
-    font-size: 0.95rem;
-  }
-
   @media (max-width: 768px) {
-    .hero {
+    .hero-zen {
       flex-direction: column;
-      gap: 1.5rem;
       text-align: center;
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 1.5rem;
+      gap: 1.5rem;
     }
-    .hero p {
-      margin: 0 auto;
+    .hero-hanko {
+      transform: none;
     }
-    .filters {
+    .filter-shoji {
       flex-direction: column;
       align-items: stretch;
     }
   }
 </style>
 
-<!-- Hero Section -->
-<section class="hero">
-  <div>
-    <span class="eyebrow">日本語会話 · SPEAK JAPANESE</span>
-    <h1>Yapon tilida <em>erkin gapiring.</em></h1>
-    <p>Real hayotdagi vaziyatlarni ovozli tinglang, javob bering va xatolaringizni qayta mashq qiling.</p>
+<!-- Modern Zen Hero Section -->
+<section class="hero-zen">
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span>●</span> Nihongo Speaking Platform
+    </div>
+    <h1>Yapon tilida <span>erkin va ishonch bilan</span> gapiring.</h1>
+    <p>Interaktiv muloqotlar orqali real hayotiy vaziyatlarda nutqingizni oshiring, tinglang va xatolaringizni o'z vaqtida to'g'rilang.</p>
   </div>
-  <div class="hero-orb">
-    日<br><small>話す</small>
+  
+  <div class="hero-hanko">
+    <span class="kanji">会話</span>
+    <span class="label">TALK</span>
   </div>
 </section>
 
-<!-- Dashboard Quick Stats -->
-<div class="dashboard-stats">
-  <div>
-    <span>🏆</span>
-    <div>
+<!-- Analytics / Dashboard Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon">🏆</div>
+    <div class="stat-data">
       <strong>{{ completed_count }}</strong>
-      <small>Yakunlangan</small>
+      <small>Yakunlangan mashq</small>
     </div>
   </div>
-  <div>
-    <span>📈</span>
-    <div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">📈</div>
+    <div class="stat-data">
       <strong>{{ avg_score }}%</strong>
-      <small>O'rtacha ball</small>
+      <small>O'rtacha natija</small>
     </div>
   </div>
-  <div>
-    <span>🎧</span>
-    <div>
-      <strong>Voice</strong>
-      <small>Ovozli mashq</small>
+
+  <div class="stat-card">
+    <div class="stat-icon">🎙️</div>
+    <div class="stat-data">
+      <strong>Ovozli</strong>
+      <small>Nutqni aniqlash</small>
     </div>
   </div>
-  <div>
-    <span>🔁</span>
-    <div>
-      <strong>∞</strong>
-      <small>Qayta o'rganish</small>
+
+  <div class="stat-card">
+    <div class="stat-icon">🔄</div>
+    <div class="stat-data">
+      <strong>Cheksiz</strong>
+      <small>Qayta takrorlash</small>
     </div>
   </div>
 </div>
 
-<!-- Filters Bar -->
-<form class="filters" method="get">
-  <div class="search">
-    <span>⌕</span>
-    <input name="q" value="{{ query }}" placeholder="Stsenariy qidirish..." data-i18n-placeholder="search">
+<!-- Search & Filters -->
+<form class="filter-shoji" method="get">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input name="q" value="{{ query }}" placeholder="Stsenariyni nomi bo'yicha qidirish..." data-i18n-placeholder="search">
   </div>
-  <select name="level">
+
+  <select class="select-custom" name="level">
     <option value="" data-i18n="all_levels">Barcha darajalar</option>
-    {% for value,label in levels %}
+    {% for value, label in levels %}
       <option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
-  <select name="category">
+
+  <select class="select-custom" name="category">
     <option value="" data-i18n="all_topics">Barcha mavzular</option>
-    {% for value,label in categories %}
+    {% for value, label in categories %}
       <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
-  <button class="btn" type="submit" data-i18n="filter">Filtrlash</button>
+
+  <button class="btn-filter" type="submit" data-i18n="filter">Filtrlash</button>
 </form>
 
-<!-- Practice Library Section -->
-<div class="section-head">
+<!-- Scenario Practice Library -->
+<div class="grid-header">
   <div>
-    <span class="eyebrow">PRACTICE LIBRARY</span>
     <h2 data-i18n="scenario_library">Suhbat stsenariylari</h2>
   </div>
-  <span class="count">{{ scenarios|length }} ta</span>
+  <span class="badge-count">{{ scenarios|length }} ta stsenariy</span>
 </div>
 
-<div class="scenario-grid">
+<div class="scenarios-wrapper">
 {% for s in scenarios %}
-  <article class="scenario-card">
-    <div class="scenario-icon">{{ s.emoji }}</div>
-    <div class="chips">
-      <span>{{ s.get_level_display }}</span>
-      <span>{{ s.get_category_display }}</span>
+  <article class="zen-card">
+    <div class="card-top">
+      <div class="card-emoji">{{ s.emoji }}</div>
+      <div class="card-tags">
+        <span class="tag-pill">{{ s.get_level_display }}</span>
+        <span class="tag-pill">{{ s.get_category_display }}</span>
+      </div>
     </div>
+
     <h3>{{ s.title }}</h3>
-    <p>{{ s.description|truncatechars:115 }}</p>
-    <div class="meta">
+    <p>{{ s.description|truncatechars:110 }}</p>
+
+    <div class="card-footer-meta">
       <span>💬 {{ s.total_steps }} qadam</span>
-      <span>⏱ {{ s.estimated_minutes }} min</span>
+      <span>⏱ {{ s.estimated_minutes }} daqiqa</span>
     </div>
-    
+
     {% if s.last_progress and s.last_progress.status == "completed" %}
-      <div class="last-score">
-        <span>Oxirgi natija</span>
-        <b>{{ s.last_progress.score }}%</b>
+      <div class="score-badge">
+        <span>Oxirgi natijangiz</span>
+        <span>{{ s.last_progress.score }}%</span>
       </div>
     {% endif %}
-    
-    <a class="btn full" href="{% url 'trainer:scenario_detail' s.pk %}">
-      {% if s.last_progress %}Davom etish{% else %}Mashqni boshlash{% endif %} →
+
+    <a class="action-link" href="{% url 'trainer:scenario_detail' s.pk %}">
+      {% if s.last_progress %}
+        Davom ettirish →
+      {% else %}
+        Mashqni boshlash →
+      {% endif %}
     </a>
   </article>
 {% empty %}
-  <div class="empty">
-    <div>🔎</div>
+  <div class="empty-box">
+    <div class="icon">🏮</div>
     <h3 data-i18n="no_scenario">Stsenariy topilmadi</h3>
-    <p data-i18n="change_filters">Filtrlarni o'zgartirib ko'ring.</p>
+    <p data-i18n="change_filters">Iltimos, boshqa kalit so'z yoki filtr variantlarini sinab ko'ring.</p>
   </div>
 {% endfor %}
 </div>
