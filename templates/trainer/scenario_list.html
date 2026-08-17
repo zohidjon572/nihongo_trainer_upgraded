@@ -1,39 +1,520 @@
 {% extends "trainer/base.html" %}
 {% block title %}Mashqlar · Nihongo Talk Trainer{% endblock %}
+
 {% block content %}
+<style>
+  /* ==========================================================================
+     SCENARIO LIST / PRACTICE LIBRARY - JAPANESE ZEN STYLE
+     ========================================================================== */
+  
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, #182335 0%, #0F172A 100%);
+    color: #FFFFFF;
+    border-radius: var(--radius-md, 16px);
+    padding: 3rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-elevated, 0 12px 30px rgba(18, 19, 22, 0.08));
+    border: 1px solid var(--color-border, #E8E5DF);
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(200, 16, 46, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--color-gold, #D4AF37);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: #FF8A9A;
+    border-bottom: 2px solid var(--color-vermilion, #C8102E);
+  }
+
+  .hero p {
+    color: #94A3B8;
+    font-size: 1rem;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .hero-orb {
+    width: 90px;
+    height: 90px;
+    background: var(--color-vermilion, #C8102E);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-japanese, 'Shippori Mincho', serif);
+    font-size: 2rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    box-shadow: 0 0 30px rgba(200, 16, 46, 0.4);
+    flex-shrink: 0;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .hero-orb small {
+    font-size: 0.75rem;
+    font-weight: normal;
+    margin-top: 2px;
+    opacity: 0.9;
+  }
+
+  /* Dashboard Stats Grid */
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .dashboard-stats > div {
+    background: var(--color-surface, #FFFFFF);
+    border: 1px solid var(--color-border, #E8E5DF);
+    border-radius: var(--radius-md, 14px);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
+    transition: transform 0.2s ease;
+  }
+
+  .dashboard-stats > div:hover {
+    transform: translateY(-2px);
+  }
+
+  .dashboard-stats span {
+    font-size: 1.8rem;
+    background: var(--color-hover, #F3EFEA);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .dashboard-stats strong {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-sumi, #121316);
+    line-height: 1.2;
+  }
+
+  .dashboard-stats small {
+    font-size: 0.82rem;
+    color: var(--color-slate, #5A626A);
+    font-weight: 500;
+  }
+
+  /* Filters Bar */
+  .filters {
+    background: var(--color-paper, #FDFBF7);
+    border: 1px solid var(--color-border, #E8E5DF);
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md, 14px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
+  }
+
+  .filters .search {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .filters .search span {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-slate, #5A626A);
+    font-size: 1.1rem;
+  }
+
+  .filters .search input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    border: 1px solid var(--color-border, #E8E5DF);
+    border-radius: var(--radius-pill, 9999px);
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: #FFFFFF;
+    color: var(--color-sumi, #121316);
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .filters .search input:focus {
+    border-color: var(--color-sumi, #121316);
+    box-shadow: 0 0 0 3px rgba(18, 19, 22, 0.06);
+  }
+
+  .filters select {
+    padding: 0.7rem 1.2rem;
+    border: 1px solid var(--color-border, #E8E5DF);
+    border-radius: var(--radius-pill, 9999px);
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: #FFFFFF;
+    color: var(--color-sumi, #121316);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .filters select:focus {
+    border-color: var(--color-sumi, #121316);
+  }
+
+  .filters .btn {
+    background: var(--color-sumi, #121316);
+    color: #FFFFFF;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-pill, 9999px);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filters .btn:hover {
+    background: var(--color-vermilion, #C8102E);
+  }
+
+  /* Section Header */
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border, #E8E5DF);
+  }
+
+  .section-head .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-vermilion, #C8102E);
+    display: block;
+  }
+
+  .section-head h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-sumi, #121316);
+  }
+
+  .section-head .count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: var(--color-hover, #F3EFEA);
+    color: var(--color-sumi, #121316);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill, 9999px);
+  }
+
+  /* Scenario Grid & Cards */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .scenario-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border, #E8E5DF);
+    border-radius: var(--radius-md, 14px);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-subtle, 0 4px 20px rgba(18, 19, 22, 0.04));
+  }
+
+  .scenario-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elevated, 0 12px 30px rgba(18, 19, 22, 0.08));
+    border-color: rgba(18, 19, 22, 0.2);
+  }
+
+  .scenario-icon {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    background: var(--color-paper, #FDFBF7);
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--color-border, #E8E5DF);
+  }
+
+  .chips {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .chips span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill, 9999px);
+    background: var(--color-hover, #F3EFEA);
+    color: var(--color-sumi, #121316);
+  }
+
+  .scenario-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-sumi, #121316);
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+  }
+
+  .scenario-card p {
+    font-size: 0.9rem;
+    color: var(--color-slate, #5A626A);
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+    flex: 1;
+  }
+
+  .meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-slate, #5A626A);
+    margin-bottom: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--color-border, #E8E5DF);
+  }
+
+  .last-score {
+    font-size: 0.82rem;
+    color: #2E7D32;
+    background: rgba(46, 125, 50, 0.08);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm, 8px);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .last-score b {
+    font-weight: 800;
+  }
+
+  .scenario-card .btn.full {
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    background: var(--color-sumi, #121316);
+    color: #FFFFFF;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-pill, 9999px);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+  }
+
+  .scenario-card .btn.full:hover {
+    background: var(--color-vermilion, #C8102E);
+  }
+
+  /* Empty State */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #FFFFFF;
+    border: 1px dashed var(--color-border, #E8E5DF);
+    border-radius: var(--radius-md, 14px);
+  }
+
+  .empty div {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty h3 {
+    font-size: 1.25rem;
+    color: var(--color-sumi, #121316);
+    margin-bottom: 0.25rem;
+  }
+
+  .empty p {
+    color: var(--color-slate, #5A626A);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .hero p {
+      margin: 0 auto;
+    }
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
 <section class="hero">
-  <div><span class="eyebrow">日本語会話 · SPEAK JAPANESE</span><h1>Yapon tilida <em>erkin gapiring.</em></h1>
-  <p>Real hayotdagi vaziyatlarni ovozli tinglang, javob bering va xatolaringizni qayta mashq qiling.</p></div>
-  <div class="hero-orb">日<br><small>話す</small></div>
+  <div>
+    <span class="eyebrow">日本語会話 · SPEAK JAPANESE</span>
+    <h1>Yapon tilida <em>erkin gapiring.</em></h1>
+    <p>Real hayotdagi vaziyatlarni ovozli tinglang, javob bering va xatolaringizni qayta mashq qiling.</p>
+  </div>
+  <div class="hero-orb">
+    日<br><small>話す</small>
+  </div>
 </section>
 
+<!-- Dashboard Quick Stats -->
 <div class="dashboard-stats">
-  <div><span>🏆</span><strong>{{ completed_count }}</strong><small>Yakunlangan</small></div>
-  <div><span>📈</span><strong>{{ avg_score }}%</strong><small>O'rtacha ball</small></div>
-  <div><span>🎧</span><strong>Voice</strong><small>Ovozli mashq</small></div>
-  <div><span>🔁</span><strong>∞</strong><small>Qayta o'rganish</small></div>
+  <div>
+    <span>🏆</span>
+    <div>
+      <strong>{{ completed_count }}</strong>
+      <small>Yakunlangan</small>
+    </div>
+  </div>
+  <div>
+    <span>📈</span>
+    <div>
+      <strong>{{ avg_score }}%</strong>
+      <small>O'rtacha ball</small>
+    </div>
+  </div>
+  <div>
+    <span>🎧</span>
+    <div>
+      <strong>Voice</strong>
+      <small>Ovozli mashq</small>
+    </div>
+  </div>
+  <div>
+    <span>🔁</span>
+    <div>
+      <strong>∞</strong>
+      <small>Qayta o'rganish</small>
+    </div>
+  </div>
 </div>
 
+<!-- Filters Bar -->
 <form class="filters" method="get">
-  <div class="search"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Stsenariy qidirish..." data-i18n-placeholder="search"></div>
-  <select name="level"><option value="" data-i18n="all_levels">Barcha darajalar</option>{% for value,label in levels %}<option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
-  <select name="category"><option value="" data-i18n="all_topics">Barcha mavzular</option>{% for value,label in categories %}<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+  <div class="search">
+    <span>⌕</span>
+    <input name="q" value="{{ query }}" placeholder="Stsenariy qidirish..." data-i18n-placeholder="search">
+  </div>
+  <select name="level">
+    <option value="" data-i18n="all_levels">Barcha darajalar</option>
+    {% for value,label in levels %}
+      <option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="category">
+    <option value="" data-i18n="all_topics">Barcha mavzular</option>
+    {% for value,label in categories %}
+      <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
   <button class="btn" type="submit" data-i18n="filter">Filtrlash</button>
 </form>
 
-<div class="section-head"><div><span class="eyebrow">PRACTICE LIBRARY</span><h2 data-i18n="scenario_library">Suhbat stsenariylari</h2></div><span class="count">{{ scenarios|length }} ta</span></div>
+<!-- Practice Library Section -->
+<div class="section-head">
+  <div>
+    <span class="eyebrow">PRACTICE LIBRARY</span>
+    <h2 data-i18n="scenario_library">Suhbat stsenariylari</h2>
+  </div>
+  <span class="count">{{ scenarios|length }} ta</span>
+</div>
+
 <div class="scenario-grid">
 {% for s in scenarios %}
   <article class="scenario-card">
     <div class="scenario-icon">{{ s.emoji }}</div>
-    <div class="chips"><span>{{ s.get_level_display }}</span><span>{{ s.get_category_display }}</span></div>
-    <h3>{{ s.title }}</h3><p>{{ s.description|truncatechars:115 }}</p>
-    <div class="meta"><span>💬 {{ s.total_steps }} qadam</span><span>⏱ {{ s.estimated_minutes }} min</span></div>
-    {% if s.last_progress and s.last_progress.status == "completed" %}<div class="last-score">Oxirgi natija <b>{{ s.last_progress.score }}%</b></div>{% endif %}
-    <a class="btn full" href="{% url 'trainer:scenario_detail' s.pk %}">{% if s.last_progress %}Davom etish{% else %}Mashqni boshlash{% endif %} →</a>
+    <div class="chips">
+      <span>{{ s.get_level_display }}</span>
+      <span>{{ s.get_category_display }}</span>
+    </div>
+    <h3>{{ s.title }}</h3>
+    <p>{{ s.description|truncatechars:115 }}</p>
+    <div class="meta">
+      <span>💬 {{ s.total_steps }} qadam</span>
+      <span>⏱ {{ s.estimated_minutes }} min</span>
+    </div>
+    
+    {% if s.last_progress and s.last_progress.status == "completed" %}
+      <div class="last-score">
+        <span>Oxirgi natija</span>
+        <b>{{ s.last_progress.score }}%</b>
+      </div>
+    {% endif %}
+    
+    <a class="btn full" href="{% url 'trainer:scenario_detail' s.pk %}">
+      {% if s.last_progress %}Davom etish{% else %}Mashqni boshlash{% endif %} →
+    </a>
   </article>
 {% empty %}
-  <div class="empty"><div>🔎</div><h3 data-i18n="no_scenario">Stsenariy topilmadi</h3><p data-i18n="change_filters">Filtrlarni o'zgartirib ko'ring.</p></div>
+  <div class="empty">
+    <div>🔎</div>
+    <h3 data-i18n="no_scenario">Stsenariy topilmadi</h3>
+    <p data-i18n="change_filters">Filtrlarni o'zgartirib ko'ring.</p>
+  </div>
 {% endfor %}
 </div>
 {% endblock %}
