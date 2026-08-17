@@ -1,0 +1,35 @@
+{% extends "trainer/base.html" %}
+{% block title %}{{ scenario.title }} · Practice{% endblock %}
+{% block content %}
+<div class="practice-top"><a class="back" href="{% url 'trainer:scenario_detail' scenario.pk %}">← <span data-i18n="back">Chiqish</span></a><span>Urinish #{{ progress.attempt_number }}</span></div>
+<div class="progress-meta"><div><b>{{ scenario.title }}</b><span>Qadam {{ step_number }} / {{ total_steps }}</span></div><div class="progress-track"><i style="width:{{ percent }}%"></i></div></div>
+<section class="dialog-card">
+  <div class="speaker"><div class="avatar">AI</div><div><b>{{ step.speaker }}</b><small data-i18n="audio">Yaponcha suhbat</small></div><button type="button" class="icon-btn" onclick="speakJapanese(document.getElementById('jp-text').innerText)" title="Tinglash">🔊</button></div>
+  <div class="jp-bubble"><div id="jp-text">{{ step.japanese_text }}</div><button type="button" class="listen" onclick="speakJapanese(document.getElementById('jp-text').innerText)">▶ <span data-i18n="listen">Eshitish</span></button></div>
+  <div class="study-lines">{% if step.romaji %}<span>Romaji: <b>{{ step.romaji }}</b></span>{% endif %}<span><span data-i18n="translate">Tarjima</span>: {{ step.translation }}</span></div>
+  {% if step.hint %}<div class="hint-box">💡 {{ step.hint }}</div>{% endif %}
+  <div class="answer-title"><span data-i18n="your_answer">Sizning javobingiz</span>{% if step.answer_type == "text" %}<button type="button" class="voice-answer" id="voiceBtn">🎙 Ovoz bilan aytish</button>{% endif %}</div>
+  <form method="post" id="answerForm">{% csrf_token %}
+  {% if step.answer_type == "choice" %}
+    <div class="choice-grid">{% for choice in choices %}<label class="choice"><input type="radio" name="choice" value="{{ choice.pk }}" required><span>{{ choice.text }}</span></label>{% endfor %}</div>
+  {% else %}
+    <input class="answer-input" id="answerInput" type="text" name="answer_text" autocomplete="off" placeholder="Yaponcha javobingizni yozing..." data-i18n-placeholder="your_answer" required autofocus>
+  {% endif %}
+  <button class="btn submit-answer" type="submit"><span data-i18n="checking">Javobni tekshirish</span> <span>→</span></button></form>
+</section>
+<div class="practice-tip">🎧 <b data-i18n="tip">Maslahat:</b> Avval “Eshitish” tugmasini bosing, keyin javobni yaponcha talaffuz qilishga harakat qiling.</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const voiceBtn=document.getElementById('voiceBtn'), input=document.getElementById('answerInput');
+if(voiceBtn && input){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){voiceBtn.disabled=true; voiceBtn.innerText='🎙 Ovoz qo‘llanmaydi';}
+ else {const r=new SR(); r.lang='ja-JP'; r.interimResults=false; r.maxAlternatives=1;
+ voiceBtn.onclick=()=>{r.start();voiceBtn.classList.add('recording');voiceBtn.innerText='⏺ Tinglanmoqda...'};
+ r.onresult=e=>{input.value=e.results[0][0].transcript;};
+ r.onend=()=>{voiceBtn.classList.remove('recording');voiceBtn.innerText='🎙 Ovoz bilan aytish'};}
+}
+document.querySelectorAll('.choice').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('.choice').forEach(y=>y.classList.remove('selected'));x.classList.add('selected')}));
+</script>
+{% endblock %}

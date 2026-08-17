@@ -1,0 +1,39 @@
+{% extends "trainer/base.html" %}
+{% block title %}Mashqlar · Nihongo Talk Trainer{% endblock %}
+{% block content %}
+<section class="hero">
+  <div><span class="eyebrow">日本語会話 · SPEAK JAPANESE</span><h1>Yapon tilida <em>erkin gapiring.</em></h1>
+  <p>Real hayotdagi vaziyatlarni ovozli tinglang, javob bering va xatolaringizni qayta mashq qiling.</p></div>
+  <div class="hero-orb">日<br><small>話す</small></div>
+</section>
+
+<div class="dashboard-stats">
+  <div><span>🏆</span><strong>{{ completed_count }}</strong><small>Yakunlangan</small></div>
+  <div><span>📈</span><strong>{{ avg_score }}%</strong><small>O'rtacha ball</small></div>
+  <div><span>🎧</span><strong>Voice</strong><small>Ovozli mashq</small></div>
+  <div><span>🔁</span><strong>∞</strong><small>Qayta o'rganish</small></div>
+</div>
+
+<form class="filters" method="get">
+  <div class="search"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Stsenariy qidirish..." data-i18n-placeholder="search"></div>
+  <select name="level"><option value="" data-i18n="all_levels">Barcha darajalar</option>{% for value,label in levels %}<option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+  <select name="category"><option value="" data-i18n="all_topics">Barcha mavzular</option>{% for value,label in categories %}<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+  <button class="btn" type="submit" data-i18n="filter">Filtrlash</button>
+</form>
+
+<div class="section-head"><div><span class="eyebrow">PRACTICE LIBRARY</span><h2 data-i18n="scenario_library">Suhbat stsenariylari</h2></div><span class="count">{{ scenarios|length }} ta</span></div>
+<div class="scenario-grid">
+{% for s in scenarios %}
+  <article class="scenario-card">
+    <div class="scenario-icon">{{ s.emoji }}</div>
+    <div class="chips"><span>{{ s.get_level_display }}</span><span>{{ s.get_category_display }}</span></div>
+    <h3>{{ s.title }}</h3><p>{{ s.description|truncatechars:115 }}</p>
+    <div class="meta"><span>💬 {{ s.total_steps }} qadam</span><span>⏱ {{ s.estimated_minutes }} min</span></div>
+    {% if s.last_progress and s.last_progress.status == "completed" %}<div class="last-score">Oxirgi natija <b>{{ s.last_progress.score }}%</b></div>{% endif %}
+    <a class="btn full" href="{% url 'trainer:scenario_detail' s.pk %}">{% if s.last_progress %}Davom etish{% else %}Mashqni boshlash{% endif %} →</a>
+  </article>
+{% empty %}
+  <div class="empty"><div>🔎</div><h3 data-i18n="no_scenario">Stsenariy topilmadi</h3><p data-i18n="change_filters">Filtrlarni o'zgartirib ko'ring.</p></div>
+{% endfor %}
+</div>
+{% endblock %}

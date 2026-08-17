@@ -1,0 +1,69 @@
+{% extends "trainer/base.html" %}{% block title %}Ro'yxatdan o'tish · Nihongo Talk{% endblock %}
+{% block content %}
+<div class="auth-stage">
+
+  <section class="auth-scene" aria-hidden="true">
+    <div class="scene-sky"></div>
+    <div class="scene-sun"></div>
+    <svg class="scene-fuji" viewBox="0 0 600 220" preserveAspectRatio="none">
+      <path d="M0,220 L140,60 L185,95 L260,10 L330,95 L410,45 L600,220 Z" fill="#22344f"/>
+      <path d="M240,45 L260,10 L280,45 L272,50 L268,42 L260,55 L252,42 L248,50 Z" fill="#f4f7fb"/>
+    </svg>
+    <div class="scene-waves">
+      <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,30 Q25,10 50,30 T100,30 T150,30 T200,30 T250,30 T300,30 T350,30 T400,30 T450,30 T500,30 T550,30 T600,30 V60 H0 Z" fill="rgba(255,255,255,0.06)"/></svg>
+    </div>
+
+    <div class="scene-torii">
+      <svg viewBox="0 0 160 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="18" width="140" height="12" rx="2" fill="#c8102e"/>
+        <rect x="0" y="34" width="160" height="7" rx="2" fill="#a50d24"/>
+        <rect x="26" y="20" width="10" height="120" fill="#c8102e"/>
+        <rect x="124" y="20" width="10" height="120" fill="#c8102e"/>
+        <rect x="18" y="70" width="124" height="8" fill="#a50d24"/>
+      </svg>
+    </div>
+
+    <div class="scene-flag-pole">
+      <svg class="scene-flag" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#clothWave)">
+          <rect x="0" y="0" width="180" height="120" fill="#fbfbfd"/>
+          <circle cx="90" cy="60" r="34" fill="#c8102e"/>
+        </g>
+      </svg>
+      <div class="pole"></div>
+    </div>
+
+    <div class="scene-copy">
+      <span class="scene-kanji">始めよう</span>
+      <h2 data-i18n="new_student">Yangi o'quvchi</h2>
+      <p data-i18n="profile_desc">Profil yarating, progressni saqlang va yapon tilini har kuni mashq qiling.</p>
+      <div class="scene-badge">№1 · Premium Nihongo Trainer</div>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-logo">語</div>
+      <span class="eyebrow" data-i18n="nav_start">START LEARNING</span>
+      <h1 data-i18n="new_student">Yangi o'quvchi</h1>
+      <p data-i18n="profile_desc">Profil yarating va progressni saqlang.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="field-group{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
+            {% if field.errors %}<div class="field-error">{{ field.errors|striptags }}</div>{% endif %}
+          </div>
+        {% endfor %}
+        {% if form.non_field_errors %}<div class="field-error form-error">{{ form.non_field_errors|striptags }}</div>{% endif %}
+        <button class="btn full" type="submit"><span data-i18n="create_account">Akkount yaratish</span> →</button>
+      </form>
+
+      <p class="auth-link"><span data-i18n="have_account">Akkountingiz bormi?</span> <a href="{% url 'trainer:login' %}"><span data-i18n="login">Kiring</span></a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,253 @@
+{% extends "trainer/base.html" %}
+{% block title %}Kirish · Nihongo Talk{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --jp-teal-dark: #1f5050;
+    --jp-bg-teal: #1a4d4a;
+    --jp-text-dark: #111111;
+    --jp-red: #bc002d;
+  }
+
+  /* Asosiy konteyner */
+  .auth-hero-section {
+    display: flex;
+    min-height: 85vh;
+    background-color: var(--jp-bg-teal);
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    margin: 20px 0;
+  }
+
+  /* Chap tarafdagi Yaponiyaga mos keluvchi Sof CSS/SVG Art (Internet shart emas) */
+  .auth-image-side {
+    flex: 1.2;
+    background: linear-gradient(180deg, #e0f2f1 0%, #b2dfdb 100%);
+    position: relative;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* O'ng tarafdagi Login Kartasi va Yaponcha naqsh foni */
+  .auth-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    background-color: var(--jp-bg-teal);
+    background-image: 
+      radial-gradient(circle at 100% 150%, rgba(255,255,255,0.12) 24%, transparent 25%),
+      radial-gradient(circle at 0% 100%, rgba(255,255,255,0.12) 24%, transparent 25%);
+    background-size: 50px 50px;
+  }
+
+  /* Oq login kartasi */
+  .auth-card {
+    background: #ffffff;
+    padding: 40px 35px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 2;
+  }
+
+  .auth-card .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--jp-teal-dark);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .auth-card h1 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--jp-text-dark);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .auth-card p.subtitle {
+    font-size: 0.85rem;
+    color: #444444;
+    margin-bottom: 25px;
+  }
+
+  /* Form maydonlari */
+  .field-group {
+    margin-bottom: 18px;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--jp-text-dark);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .field-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dbe3e6;
+    background-color: #eef4f8;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .field-group input:focus {
+    border-color: var(--jp-teal-dark);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(31, 80, 80, 0.15);
+  }
+
+  /* Xatoliklar */
+  .field-group.has-error input {
+    border-color: #d9534f;
+    background-color: #fdf2f2;
+  }
+
+  .field-error {
+    color: #d9534f;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  .form-error {
+    margin-bottom: 15px;
+  }
+
+  /* Kirish tugmasi */
+  .btn-submit {
+    width: 100%;
+    background-color: var(--jp-teal-dark);
+    color: #ffffff;
+    border: none;
+    padding: 13px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  .btn-submit:hover {
+    background-color: #153737;
+  }
+
+  .auth-link {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #444444;
+  }
+
+  .auth-link a {
+    color: var(--jp-teal-dark);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .auth-link a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .auth-hero-section {
+      flex-direction: column;
+    }
+    .auth-image-side {
+      min-height: 280px;
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="auth-hero-section">
+  <!-- Chap taraf: Yaponiyaga va Ta'lim/Kitobga mos chiroyli SVG tasviri -->
+  <div class="auth-image-side">
+    <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+      <!-- Qizil Yapon Quyoshi -->
+      <circle cx="250" cy="220" r="100" fill="#bc002d" opacity="0.85" />
+
+      <!-- Fuji Tog'i silueti -->
+      <path d="M 50 480 L 250 200 L 450 480 Z" fill="#264653" />
+      <!-- Fuji qor cho'qqisi -->
+      <path d="M 200 270 L 250 200 L 300 270 L 280 280 L 265 265 L 250 280 L 235 265 L 220 280 Z" fill="#ffffff" />
+
+      <!-- Ochilgan Yaponcha Kitob -->
+      <g transform="translate(100, 360)">
+        <!-- Kitob sahifalari -->
+        <path d="M 10 60 Q 150 20 250 60 Q 350 20 490 60 L 480 160 Q 350 120 250 150 Q 150 120 20 160 Z" fill="#fefae0" stroke="#2b2d42" stroke-width="3"/>
+        <line x1="250" y1="60" x2="250" y2="150" stroke="#2b2d42" stroke-width="3" />
+        
+        <!-- Kitobdagi yaponcha matn shakllari -->
+        <text x="80" y="95" font-family="'Noto Sans JP', sans-serif" font-size="22" fill="#2a9d8f" font-weight="bold">日本語</text>
+        <text x="80" y="125" font-family="'Noto Sans JP', sans-serif" font-size="16" fill="#e76f51">会話練習</text>
+
+        <text x="290" y="95" font-family="'Noto Sans JP', sans-serif" font-size="22" fill="#2a9d8f" font-weight="bold">ひらがな</text>
+        <text x="290" y="125" font-family="'Noto Sans JP', sans-serif" font-size="16" fill="#e76f51">カタカナ</text>
+      </g>
+
+      <!-- Sakura gultojibarglari -->
+      <circle cx="120" cy="120" r="8" fill="#ffb703" opacity="0.8"/>
+      <circle cx="380" cy="140" r="12" fill="#ffb703" opacity="0.8"/>
+      <circle cx="420" cy="200" r="6" fill="#ffb703" opacity="0.8"/>
+      <circle cx="90" cy="250" r="10" fill="#ffb703" opacity="0.8"/>
+    </svg>
+  </div>
+
+  <!-- O'ng taraf: Login formasi -->
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <span class="eyebrow" data-i18n="nav_login">WELCOME BACK</span>
+      <h1 data-i18n="auth_back">Qaytganingizdan xursandmiz</h1>
+      <p class="subtitle" data-i18n="auth_back_desc">Yaponcha suhbat mashqlarini davom ettiring.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="field-group{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="field-error">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+          <div class="field-error form-error">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <button class="btn-submit" type="submit" data-i18n="nav_login">KIRISH →</button>
+      </form>
+
+      <p class="auth-link">
+        <span data-i18n="account_none">Akkount yo'qmi?</span> 
+        <a href="{% url 'trainer:register' %}"><span data-i18n="register">Ro'yxatdan o'ting</span></a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

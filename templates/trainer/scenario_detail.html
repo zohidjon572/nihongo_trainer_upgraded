@@ -1,0 +1,11 @@
+{% extends "trainer/base.html" %}
+{% block title %}{{ scenario.title }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'trainer:scenario_list' %}">← <span data-i18n="all_practice">Barcha mashqlar</span></a>
+<section class="detail-hero"><div class="big-icon">{{ scenario.emoji }}</div><div><div class="chips"><span>{{ scenario.get_level_display }}</span><span>{{ scenario.get_category_display }}</span></div><h1>{{ scenario.title }}</h1><p>{{ scenario.description }}</p></div></section>
+<div class="detail-grid">
+  <div class="card"><h3>🎯 <span data-i18n="practice">Bu mashqda</span></h3><div class="feature"><b>💬 {{ scenario.total_steps }}</b><span data-i18n="dialog">dialog qadami</span></div><div class="feature"><b>🎧 Ovozli</b><span data-i18n="japanese_listening">yaponcha tinglash</span></div><div class="feature"><b>🗣 Speech</b><span data-i18n="voice_answer">ovoz bilan javob berish</span></div><div class="feature"><b>🔁 Retry</b><span data-i18n="unlimited">istalgancha takrorlash</span></div></div>
+  <div class="card start-card"><span class="eyebrow">READY?</span><h2 data-i18n="speak">Gapirishga tayyormisiz?</h2>{% if best %}<p>Eng yaxshi natijangiz: <strong>{{ best.score }}%</strong></p>{% endif %}<a class="btn full" href="{% url 'trainer:start_scenario' scenario.pk %}">🚀 <span data-i18n="start">Mashqni boshlash</span></a><a class="btn secondary full" href="{% url 'trainer:retry_scenario' scenario.pk %}">↻ <span data-i18n="retry">Qayta boshlash</span></a></div>
+</div>
+{% if history %}<section class="card"><div class="section-head"><h2 data-i18n="old_attempts">Oldingi urinishlar</h2></div><div class="history-mini">{% for h in history %}<div><span>#{{ h.attempt_number }}</span><b>{{ h.score }}%</b><small>{{ h.started_at|date:"d.m.Y H:i" }}</small><a href="{% if h.status == 'completed' %}{% url 'trainer:result' h.pk %}{% else %}{% url 'trainer:practice' h.pk %}{% endif %}">{% if h.status == "completed" %}Natija{% else %}Davom{% endif %} →</a></div>{% endfor %}</div></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Nihongo Talk Trainer{% endblock %}</title>
+  <meta name="description" content="Nihongo Talk Trainer — yapon, o'zbek va ingliz tillarida suhbat mashqi">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- Reusable waving Japan flag (SVG + cloth-wave filter) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="clothWave" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="turbulence" baseFrequency="0.012 0.09" numOctaves="2" seed="7" result="turb">
+        <animate attributeName="baseFrequency" dur="5s" values="0.012 0.09;0.02 0.11;0.012 0.09" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="turb" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<header class="topbar">
+  <a class="brand" href="{% url 'trainer:scenario_list' %}">
+    <span class="brand-mark">日</span>
+    <span class="brand-text">Nihongo <b>Talk</b><em>№1</em></span>
+  </a>
+  <nav>
+    <div class="language-switcher" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="uz">🇺🇿 UZ</button>
+      <button type="button" class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+      <button type="button" class="lang-btn" data-lang="en">🇬🇧 EN</button>
+    </div>
+    {% if user.is_authenticated %}
+      <a href="{% url 'trainer:scenario_list' %}" data-i18n="nav_practice">Mashqlar</a>
+      <a href="{% url 'trainer:history' %}" data-i18n="nav_history">Tarix</a>
+      {% if user.is_staff %}<a href="{% url 'admin:index' %}">⚙ <span data-i18n="nav_admin">Admin</span></a>{% endif %}
+      <a class="user-pill" href="{% url 'trainer:history' %}">👤 {{ user.username }}</a>
+      <form method="post" action="{% url 'trainer:logout' %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="link-btn" data-i18n="nav_logout">Chiqish</button>
+      </form>
+    {% else %}
+      <div class="flag-action">
+        <svg class="waving-japan-flag" viewBox="0 0 60 40" aria-hidden="true"><g filter="url(#clothWave)"><rect width="60" height="40" rx="2" fill="#fff" stroke="#e2e5ea" stroke-width="1"/><circle cx="30" cy="20" r="12" fill="#c8102e"/></g></svg>
+        <a href="{% url 'trainer:login' %}" data-i18n="nav_login">Kirish</a>
+      </div>
+      <div class="flag-action">
+        <svg class="waving-japan-flag" viewBox="0 0 60 40" aria-hidden="true"><g filter="url(#clothWave)"><rect width="60" height="40" rx="2" fill="#fff" stroke="#e2e5ea" stroke-width="1"/><circle cx="30" cy="20" r="12" fill="#c8102e"/></g></svg>
+        <a class="nav-cta" href="{% url 'trainer:register' %}" data-i18n="nav_start">Boshlash</a>
+      </div>
+    {% endif %}
+  </nav>
+</header>
+<main class="container">
+  {% if messages %}<div class="messages">{% for message in messages %}<div class="toast {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<footer><span>日本語</span> Nihongo Talk Trainer · Django Learning Platform · <span data-i18n="footer_text">O'zbekcha · 日本語 · English</span></footer>
+<script>
+const I18N = {
+  uz: {
+    nav_practice:'Mashqlar', nav_history:'Tarix', nav_admin:'Admin', nav_logout:'Chiqish', nav_login:'Kirish', nav_start:'Boshlash',
+    footer_text:"O'zbekcha · 日本語 · English",
+    listen:'Eshitish', voice:'Ovoz bilan aytish', checking:'Javobni tekshirish', back:'Chiqish',
+    history:'O\'rganish tarixi', results:'Natijalar', practice:'Mashqlar', start:'Mashqni boshlash', retry:'Qayta boshlash',
+    all_levels:'Barcha darajalar', all_topics:'Barcha mavzular', filter:'Filtrlash', search:'Stsenariy qidirish...',
+    learning_history:'O\'rganish tarixi', progress_desc:'Har bir urinish, ball va rivojlanishingiz bir joyda.',
+    total_attempts:'Jami urinish', completed:'Yakunlangan', average:'O\'rtacha ball', best:'Eng yaxshi natija',
+    no_history:'Tarix hali bo\'sh', first_practice:'Birinchi suhbat mashqini boshlang.', view_practice:'Mashqlarni ko\'rish',
+    scenario_library:'Suhbat stsenariylari', step:'Qadam', your_answer:'Sizning javobingiz', hint:'Maslahat',
+    translate:'Tarjima', romaji:'Romaji', answer:'Javobni tekshirish', tip:'Maslahat',
+    ready:'Tayyormisiz?', speak:'Gapirishga tayyormisiz?', retry_learning:'Qayta o\'rganish', my_history:'Tarixim', other_practice:'Boshqa mashqlar',
+    old_attempts:'Oldingi urinishlar', result:'Natija', continue:'Davom', all_practice:'Barcha mashqlar',
+    no_scenario:'Stsenariy topilmadi', change_filters:'Filtrlarni o\'zgartirib ko\'ring.',
+    auth_back:'Qaytganingizdan xursandmiz', auth_back_desc:'Yaponcha suhbat mashqlarini davom ettiring.',
+    account_none:'Akkount yo\'qmi?', register:'Ro\'yxatdan o\'ting', new_student:'Yangi o\'quvchi',
+    profile_desc:'Profil yarating va progressni saqlang.', create_account:'Akkount yaratish', have_account:'Akkountingiz bormi?', login:'Kiring',
+    complete:'PRACTICE COMPLETE', completed_desc:'mashqi yakunlandi. Natijangizni tahlil qiling va yana bir marta urinib ko\'ring.',
+    correct:'To\'g\'ri javob', score:'Umumiy ball', attempt:'Urinish', analysis:'Javoblar tahlili',
+    yours:'Siz:', dialog:'dialog qadami', audio:'Ovozli', japanese_listening:'yaponcha tinglash', speech:'Speech', voice_answer:'ovoz bilan javob berish', unlimited:'istalgancha takrorlash'
+  },
+  ja: {
+    nav_practice:'練習', nav_history:'学習履歴', nav_admin:'管理', nav_logout:'ログアウト', nav_login:'ログイン', nav_start:'始める',
+    footer_text:'O\'zbekcha · 日本語 · English', listen:'聞く', voice:'音声で答える', checking:'回答を確認', back:'終了',
+    history:'学習履歴', results:'結果', practice:'練習', start:'練習を開始', retry:'もう一度', all_levels:'すべてのレベル', all_topics:'すべてのテーマ', filter:'絞り込む', search:'シナリオを検索...',
+    learning_history:'学習履歴', progress_desc:'すべての挑戦、スコア、成長をここで確認できます。', total_attempts:'挑戦回数', completed:'完了', average:'平均スコア', best:'最高スコア',
+    no_history:'履歴はまだありません', first_practice:'最初の会話練習を始めましょう。', view_practice:'練習を見る', scenario_library:'会話シナリオ', step:'ステップ', your_answer:'あなたの答え', hint:'ヒント', translate:'翻訳', romaji:'ローマ字', answer:'回答を確認', tip:'ヒント', ready:'準備OK?', speak:'話す準備はできましたか？', retry_learning:'復習する', my_history:'履歴', other_practice:'他の練習', old_attempts:'以前の挑戦', result:'結果', continue:'続ける', all_practice:'すべての練習', no_scenario:'シナリオが見つかりません', change_filters:'フィルターを変更してみてください。',
+    auth_back:'おかえりなさい', auth_back_desc:'日本語の会話練習を続けましょう。', account_none:'アカウントがありませんか？', register:'登録する', new_student:'新しい学習者', profile_desc:'プロフィールを作成して進捗を保存しましょう。', create_account:'アカウントを作成', have_account:'アカウントをお持ちですか？', login:'ログイン',
+    complete:'練習完了', completed_desc:'の練習が完了しました。結果を分析して、もう一度挑戦しましょう。', correct:'正解', score:'総合スコア', attempt:'挑戦', analysis:'回答分析', yours:'あなた:', dialog:'会話ステップ', audio:'音声', japanese_listening:'日本語リスニング', speech:'スピーチ', voice_answer:'音声で回答', unlimited:'何度でも復習できます'
+  },
+  en: {
+    nav_practice:'Practice', nav_history:'History', nav_admin:'Admin', nav_logout:'Log out', nav_login:'Log in', nav_start:'Get started',
+    footer_text:"O'zbekcha · 日本語 · English", listen:'Listen', voice:'Answer by voice', checking:'Check answer', back:'Exit', history:'Learning History', results:'Results', practice:'Practice', start:'Start Practice', retry:'Retry', all_levels:'All levels', all_topics:'All topics', filter:'Filter', search:'Search scenarios...',
+    learning_history:'Learning History', progress_desc:'All attempts, scores, and progress in one place.', total_attempts:'Total attempts', completed:'Completed', average:'Average score', best:'Best score', no_history:'No history yet', first_practice:'Start your first conversation practice.', view_practice:'View practice', scenario_library:'Conversation scenarios', step:'Step', your_answer:'Your answer', hint:'Hint', translate:'Translation', romaji:'Romaji', answer:'Check answer', tip:'Tip', ready:'READY?', speak:'Ready to speak?', retry_learning:'Review again', my_history:'My history', other_practice:'Other practice', old_attempts:'Previous attempts', result:'Result', continue:'Continue', all_practice:'All practice', no_scenario:'No scenario found', change_filters:'Try changing the filters.',
+    auth_back:'Welcome back', auth_back_desc:'Continue your Japanese conversation practice.', account_none:"Don't have an account?", register:'Register', new_student:'New learner', profile_desc:'Create a profile and save your progress.', create_account:'Create account', have_account:'Already have an account?', login:'Log in',
+    complete:'PRACTICE COMPLETE', completed_desc:'practice is complete. Review your result and try again.', correct:'Correct answers', score:'Overall score', attempt:'Attempt', analysis:'Answer analysis', yours:'You:', dialog:'dialogue step', audio:'Audio', japanese_listening:'Japanese listening', speech:'Speech', voice_answer:'voice answer', unlimited:'retry as many times as you like'
+  }
+};
+function setLanguage(lang){
+  lang=I18N[lang]?lang:'uz'; localStorage.setItem('nihongo_lang',lang); document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(I18N[lang][k])el.textContent=I18N[lang][k];});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.dataset.i18nPlaceholder;if(I18N[lang][k])el.placeholder=I18N[lang][k];});
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+}
+document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
+function speakJapanese(text) {
+  if (!('speechSynthesis' in window)) { alert('Audio is not supported by your browser.'); return; }
+  speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=0.86; u.pitch=1;
+  const voices=speechSynthesis.getVoices(); const jp=voices.find(v=>v.lang.toLowerCase().startsWith('ja')); if(jp) u.voice=jp; speechSynthesis.speak(u);
+}
+function stopSpeaking(){ if('speechSynthesis' in window) speechSynthesis.cancel(); }
+setLanguage(localStorage.getItem('nihongo_lang') || 'uz');
+</script>
+{% block scripts %}{% endblock %}
+</body></html>

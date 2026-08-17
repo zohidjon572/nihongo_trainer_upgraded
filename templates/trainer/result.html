@@ -1,0 +1,10 @@
+{% extends "trainer/base.html" %}
+{% block title %}Natija · {{ progress.scenario.title }}{% endblock %}
+{% block content %}
+<div class="result-hero"><div class="result-ring" style="--score:{{ progress.score }}%"><strong>{{ progress.score|floatformat:0 }}%</strong></div><div><span class="eyebrow" data-i18n="complete">PRACTICE COMPLETE</span><h1>お疲れ様でした！</h1><p>{{ progress.scenario.title }} mashqi yakunlandi. Natijangizni tahlil qiling va yana bir marta urinib ko'ring.</p></div></div>
+<div class="dashboard-stats result-stats"><div><span>✓</span><strong>{{ progress.correct_answers }}/{{ progress.total_steps }}</strong><small data-i18n="correct">To'g'ri javob</small></div><div><span>🎯</span><strong>{{ progress.score }}%</strong><small data-i18n="score">Umumiy ball</small></div><div><span>🔁</span><strong>#{{ progress.attempt_number }}</strong><small data-i18n="attempt">Urinish</small></div></div>
+<section class="card"><div class="section-head"><h2 data-i18n="analysis">Javoblar tahlili</h2><span class="count">{{ answers|length }} ta</span></div>
+{% for a in answers %}<div class="answer-review {% if a.is_correct %}correct{% else %}wrong{% endif %}"><span class="answer-icon">{% if a.is_correct %}✓{% else %}×{% endif %}</span><div><b>{{ a.step.japanese_text }}</b><small><span data-i18n="yours">Siz:</span> {{ a.given_answer_text }}</small></div></div>{% endfor %}
+</section>
+<div class="action-row"><a class="btn" href="{% url 'trainer:retry_scenario' progress.scenario.pk %}">🔁 <span data-i18n="retry_learning">Qayta o'rganish</span></a><a class="btn secondary" href="{% url 'trainer:history' %}">📊 <span data-i18n="my_history">Tarixim</span></a><a class="btn secondary" href="{% url 'trainer:scenario_list' %}"><span data-i18n="other_practice">Boshqa mashqlar</span></a></div>
+{% endblock %}

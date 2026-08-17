@@ -1,0 +1,10 @@
+{% extends "trainer/base.html" %}
+{% block title %}O'rganish tarixi{% endblock %}
+{% block content %}
+<div class="page-heading"><span class="eyebrow" data-i18n="history">MY PROGRESS</span><h1 data-i18n="learning_history">O'rganish tarixi</h1><p data-i18n="progress_desc">Har bir urinish, ball va rivojlanishingiz bir joyda.</p></div>
+<div class="dashboard-stats"><div><span>📚</span><strong>{{ total_attempts }}</strong><small data-i18n="total_attempts">Jami urinish</small></div><div><span>✓</span><strong>{{ completed_count }}</strong><small data-i18n="completed">Yakunlangan</small></div><div><span>📈</span><strong>{{ avg_score }}%</strong><small data-i18n="average">O'rtacha ball</small></div><div><span>🏆</span><strong>{{ best_score }}%</strong><small data-i18n="best">Eng yaxshi natija</small></div></div>
+<section class="card"><div class="section-head"><h2 data-i18n="results">Natijalar</h2></div>
+{% for r in records %}<div class="history-row"><div class="mini-icon">{{ r.scenario.emoji }}</div><div class="history-main"><b>{{ r.scenario.title }}</b><small>#{{ r.attempt_number }} · {{ r.started_at|date:"d.m.Y H:i" }}</small></div><div class="score {% if r.score >= 80 %}good{% elif r.score >= 50 %}mid{% endif %}">{{ r.score }}%</div><div>{% if r.status == "completed" %}<a class="btn small secondary" href="{% url 'trainer:result' r.pk %}">Natija</a>{% else %}<a class="btn small" href="{% url 'trainer:practice' r.pk %}">Davom</a>{% endif %}</div></div>
+{% empty %}<div class="empty"><div>📖</div><h3 data-i18n="no_history">Tarix hali bo'sh</h3><p data-i18n="first_practice">Birinchi suhbat mashqini boshlang.</p><a class="btn" href="{% url 'trainer:scenario_list' %}"><span data-i18n="view_practice">Mashqlarni ko'rish</span></a></div>{% endfor %}
+</section>
+{% endblock %}
