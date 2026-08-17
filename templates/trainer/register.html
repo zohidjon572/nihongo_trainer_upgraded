@@ -1,17 +1,325 @@
-{% extends "trainer/base.html" %}{% block title %}Ro'yxatdan o'tish · Nihongo Talk{% endblock %}
+{% extends "trainer/base.html" %}
+{% block title %}Ro'yxatdan o'tish · Nihongo Talk{% endblock %}
+
 {% block content %}
+<style>
+  /* ==========================================================================
+     AUTHENTICATION PAGE - JAPANESE ZEN MINIMALISM
+     ========================================================================== */
+  .auth-stage {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    min-height: calc(100vh - 180px);
+    background: #FFFFFF;
+    border-radius: var(--radius-md, 16px);
+    overflow: hidden;
+    box-shadow: var(--shadow-elevated, 0 12px 30px rgba(18, 19, 22, 0.08));
+    border: 1px solid var(--color-border, #E8E5DF);
+    margin: 1rem 0 3rem 0;
+  }
+
+  /* Left Side: Japanese Art Scene */
+  .auth-scene {
+    position: relative;
+    background: linear-gradient(180deg, #182335 0%, #0F172A 100%);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #FFFFFF;
+    overflow: hidden;
+  }
+
+  .scene-sun {
+    position: absolute;
+    top: 15%;
+    right: 15%;
+    width: 140px;
+    height: 140px;
+    background: var(--color-vermilion, #C8102E);
+    border-radius: 50%;
+    opacity: 0.85;
+    filter: blur(1px);
+    box-shadow: 0 0 40px rgba(200, 16, 46, 0.4);
+  }
+
+  .scene-fuji {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
+    z-index: 1;
+    opacity: 0.9;
+  }
+
+  .scene-torii {
+    position: absolute;
+    bottom: 25px;
+    left: 40px;
+    width: 110px;
+    z-index: 2;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+  }
+
+  .scene-flag-pole {
+    position: absolute;
+    top: 35px;
+    right: 40px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    z-index: 2;
+  }
+
+  .scene-flag {
+    width: 65px;
+    height: 44px;
+    border-radius: 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  .pole {
+    width: 3px;
+    height: 90px;
+    background: linear-gradient(to bottom, #d1d5db, #4b5563);
+    border-radius: 2px;
+  }
+
+  .scene-copy {
+    position: relative;
+    z-index: 3;
+    max-width: 380px;
+    margin-top: auto;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .scene-kanji {
+    font-family: var(--font-japanese, 'Shippori Mincho', serif);
+    color: var(--color-gold, #D4AF37);
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .scene-copy h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #FDFBF7;
+  }
+
+  .scene-copy p {
+    font-size: 0.92rem;
+    color: #94A3B8;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .scene-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(200, 16, 46, 0.2);
+    color: #FF8A9A;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(200, 16, 46, 0.3);
+  }
+
+  /* Right Side: Form Panel */
+  .auth-panel {
+    padding: 3rem 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-paper, #FDFBF7);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .auth-logo {
+    width: 48px;
+    height: 48px;
+    background: var(--color-sumi, #121316);
+    color: var(--color-paper, #FDFBF7);
+    font-family: var(--font-japanese, 'Shippori Mincho', serif);
+    font-size: 1.6rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-vermilion, #C8102E);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .auth-card h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-sumi, #121316);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .auth-card > p {
+    color: var(--color-slate, #5A626A);
+    font-size: 0.92rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Django Form Styling */
+  .field-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-sumi, #121316);
+    margin-bottom: 0.4rem;
+  }
+
+  .field-group input, 
+  .field-group select, 
+  .field-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    border: 1px solid var(--color-border, #E8E5DF);
+    border-radius: var(--radius-sm, 8px);
+    background: #FFFFFF;
+    color: var(--color-sumi, #121316);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+  }
+
+  .field-group input:focus {
+    outline: none;
+    border-color: var(--color-sumi, #121316);
+    box-shadow: 0 0 0 3px rgba(18, 19, 22, 0.08);
+  }
+
+  .field-help {
+    font-size: 0.78rem;
+    color: var(--color-slate, #5A626A);
+    margin-top: 0.35rem;
+    line-height: 1.4;
+  }
+
+  .field-error {
+    font-size: 0.8rem;
+    color: var(--color-vermilion, #C8102E);
+    font-weight: 500;
+    margin-top: 0.35rem;
+  }
+
+  .has-error input {
+    border-color: var(--color-vermilion, #C8102E);
+    background-color: rgba(200, 16, 46, 0.02);
+  }
+
+  .form-error {
+    padding: 0.75rem;
+    background: rgba(200, 16, 46, 0.06);
+    border-radius: var(--radius-sm, 8px);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Submit Button */
+  .btn.full {
+    width: 100%;
+    background: var(--color-sumi, #121316);
+    color: #FFFFFF;
+    border: none;
+    padding: 0.85rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: var(--radius-pill, 9999px);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(18, 19, 22, 0.15);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn.full:hover {
+    background: var(--color-vermilion, #C8102E);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(200, 16, 46, 0.25);
+  }
+
+  /* Bottom Link */
+  .auth-link {
+    text-align: center;
+    margin-top: 1.75rem;
+    font-size: 0.9rem;
+    color: var(--color-slate, #5A626A);
+  }
+
+  .auth-link a {
+    color: var(--color-sumi, #121316);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 0.25rem;
+    border-bottom: 1px solid var(--color-sumi, #121316);
+    transition: all 0.2s ease;
+  }
+
+  .auth-link a:hover {
+    color: var(--color-vermilion, #C8102E);
+    border-color: var(--color-vermilion, #C8102E);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .auth-stage {
+      grid-template-columns: 1fr;
+    }
+    .auth-scene {
+      display: none;
+    }
+    .auth-panel {
+      padding: 2.5rem 1.5rem;
+    }
+  }
+</style>
+
 <div class="auth-stage">
 
+  <!-- Left Side: Visual Experience -->
   <section class="auth-scene" aria-hidden="true">
     <div class="scene-sky"></div>
     <div class="scene-sun"></div>
+    
     <svg class="scene-fuji" viewBox="0 0 600 220" preserveAspectRatio="none">
-      <path d="M0,220 L140,60 L185,95 L260,10 L330,95 L410,45 L600,220 Z" fill="#22344f"/>
-      <path d="M240,45 L260,10 L280,45 L272,50 L268,42 L260,55 L252,42 L248,50 Z" fill="#f4f7fb"/>
+      <path d="M0,220 L140,60 L185,95 L260,10 L330,95 L410,45 L600,220 Z" fill="#152032"/>
+      <path d="M240,45 L260,10 L280,45 L272,50 L268,42 L260,55 L252,42 L248,50 Z" fill="#F3EFEA"/>
     </svg>
-    <div class="scene-waves">
-      <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,30 Q25,10 50,30 T100,30 T150,30 T200,30 T250,30 T300,30 T350,30 T400,30 T450,30 T500,30 T550,30 T600,30 V60 H0 Z" fill="rgba(255,255,255,0.06)"/></svg>
-    </div>
 
     <div class="scene-torii">
       <svg viewBox="0 0 160 150" xmlns="http://www.w3.org/2000/svg">
@@ -26,7 +334,7 @@
     <div class="scene-flag-pole">
       <svg class="scene-flag" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#clothWave)">
-          <rect x="0" y="0" width="180" height="120" fill="#fbfbfd"/>
+          <rect x="0" y="0" width="180" height="120" fill="#FDFBF7"/>
           <circle cx="90" cy="60" r="34" fill="#c8102e"/>
         </g>
       </svg>
@@ -41,6 +349,7 @@
     </div>
   </section>
 
+  <!-- Right Side: Registration Form -->
   <section class="auth-panel">
     <div class="auth-card">
       <div class="auth-logo">語</div>
@@ -54,16 +363,30 @@
           <div class="field-group{% if field.errors %} has-error{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
-            {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
-            {% if field.errors %}<div class="field-error">{{ field.errors|striptags }}</div>{% endif %}
+            {% if field.help_text %}
+              <div class="field-help">{{ field.help_text|safe }}</div>
+            {% endif %}
+            {% if field.errors %}
+              <div class="field-error">{{ field.errors|striptags }}</div>
+            {% endif %}
           </div>
         {% endfor %}
-        {% if form.non_field_errors %}<div class="field-error form-error">{{ form.non_field_errors|striptags }}</div>{% endif %}
-        <button class="btn full" type="submit"><span data-i18n="create_account">Akkount yaratish</span> →</button>
+
+        {% if form.non_field_errors %}
+          <div class="field-error form-error">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <button class="btn full" type="submit">
+          <span data-i18n="create_account">Akkount yaratish</span> →
+        </button>
       </form>
 
-      <p class="auth-link"><span data-i18n="have_account">Akkountingiz bormi?</span> <a href="{% url 'trainer:login' %}"><span data-i18n="login">Kiring</span></a></p>
+      <p class="auth-link">
+        <span data-i18n="have_account">Akkountingiz bormi?</span> 
+        <a href="{% url 'trainer:login' %}"><span data-i18n="login">Kiring</span></a>
+      </p>
     </div>
   </section>
+
 </div>
 {% endblock %}
