@@ -29,7 +29,7 @@ DEBUG = True
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
